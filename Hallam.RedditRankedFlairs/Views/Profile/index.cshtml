@@ -1,0 +1,79 @@
+﻿@model Hallam.RedditRankedFlairs.Models.ProfileViewModel
+@{
+    Layout = "~/Views/_layout.cshtml";
+    Page.Title = "Profile";
+}
+@section head {
+    <link rel="stylesheet" href="~/Content/Styles/profile.less">
+    <link rel="stylesheet" href="~/Content/Styles/modal.less">
+    <script src="~/Content/js/modal.js"></script>
+}
+
+<h2>Profile for /u/@User.Identity.Name</h2>
+
+@if (!string.IsNullOrEmpty(Request.QueryString["error"]))
+{
+    <div class="notify notify-error">
+        @Request.QueryString["error"]
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Request.QueryString["success"]))
+{
+    <div class="notify notify-success">
+        @Request.QueryString["success"]
+    </div>
+}
+
+<div style="margin-bottom: 10px">
+    <button type="button" onclick="modal('#register-modal')">
+        <i class="fa fa-bars"></i> Register Summoner
+    </button>
+</div>
+
+
+@Html.Partial("_register")
+
+<table class="table">
+    <thead>
+        <tr>
+            <th style="width: 18%">Region</th>
+            <th style="width: 24%">Summoner Name</th>
+            <th style="width: 24%">League</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pendingReg in Model.Registrations)
+        {
+            <tr>
+                <td>@pendingReg.Region</td>
+                <td>@pendingReg.SummonerName</td>
+                <td>&nbsp;</td>
+                <td>
+                    <button type="button" class="label label-danger">
+                        <span><i class="fa fa-exclamation"></i> Validation Required</span>
+                    </button>
+                </td>
+            </tr>
+        }
+
+        @foreach (var summoner in Model.User.Summoners)
+        {
+            <tr>
+                <td>@summoner.Region</td>
+                <td>@summoner.Name</td>
+                <td><em>Updating...</em></td>
+                <td>
+                    <span class="label label-success">Validated</span>
+                    @if (summoner.Id == Model.User.ActiveSummoner.Id)
+                    {
+                        <span class="label label-primary">Active</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal-overlay"></div>

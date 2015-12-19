@@ -1,0 +1,16 @@
+﻿@using Hallam.RedditRankedFlairs.Models
+<div id="register-modal" class="modal modal-fade-in">
+    <div class="modal-content">
+        <h3>Register Summoner</h3>
+        <form action="~/profile/register" method="post">
+            <input type="text" name="summonerName" id="summonerName" placeholder="Summoner Name">
+            <select name="region" id="region">
+                @foreach (var region in SummonerModel.AllRegions)
+                {
+                    <option value="@region">@region</option>
+                }
+            </select>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</div>
