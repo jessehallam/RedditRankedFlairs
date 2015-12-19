@@ -12,20 +12,6 @@ namespace Hallam.RedditRankedFlairs.Controllers
     [Authorize]
     public class ProfileController : Controller
     {
-        private const string RegistrationContextKey = "registration_context";
-
-        private RegistrationContext Registration
-        {
-            get
-            {
-                if (Session[RegistrationContextKey] == null)
-                {
-                    Session[RegistrationContextKey] = new RegistrationContext();
-                }
-                return (RegistrationContext)Session[RegistrationContextKey];
-            }
-        }
-
         public IRiotService Riot { get; set; }
         public ISummonerService Summoners { get; set; }
         public IUserService Users { get; set; }
@@ -68,14 +54,7 @@ namespace Hallam.RedditRankedFlairs.Controllers
             {
                 return Error("Summoner not found.");
             }
-            
-            // Rule: Summoner must not be awaiting validation.
-            if (Registration.Contains(model.Region, summoner.Name))
-            {
-                return Error("That summoner requires validation.");
-            }
 
-            Registration.Add(model.Region, summoner.Name);
             return Success();
         }
 
@@ -83,9 +62,6 @@ namespace Hallam.RedditRankedFlairs.Controllers
         {
             var viewModel = new ProfileViewModel
             {
-                Registrations = Session[RegistrationContextKey] != null
-                    ? Registration.Items
-                    : new List<RegistrationInfo>(0),
                 User = await Users.FindAsync(User.Identity.Name),
             };
             return viewModel;
@@ -106,64 +82,6 @@ namespace Hallam.RedditRankedFlairs.Controllers
         private ActionResult Success()
         {
             return RedirectToAction("Index");
-        }
-
-
-
-        private class RegistrationContext
-        {
-            private static readonly Random Random = new Random();
-            public const int MaxRegistrations = 5;
-
-            public List<RegistrationInfo> Items = new List<RegistrationInfo>();
-
-            public RegistrationInfo Add(string region, string summonerName)
-            {
-                if (Items.Count == MaxRegistrations)
-                {
-                    Items.RemoveAt(0);
-                }
-                var item = new RegistrationInfo
-                {
-                    Region = region,
-                    SummonerName = summonerName,
-                    ValidationCode = GetValidationCode()
-                };
-                Items.Add(item);
-                return item;
-            }
-
-            public bool Contains(string region, string summonerName)
-            {
-                return Items.Any(GetComparer(region, summonerName));
-            }
-
-            public void Remove(string region, string summonerName)
-            {
-                var comparer = GetComparer(region, summonerName);
-                Items.RemoveAll(info => comparer(info));
-            }
-
-            private static Func<RegistrationInfo, bool> GetComparer(string region, string summonerName)
-            {
-                return info => info.Region.Equals(region, StringComparison.OrdinalIgnoreCase)
-                               && info.SummonerName.Equals(summonerName, StringComparison.OrdinalIgnoreCase);
-            } 
-
-            private static string GetValidationCode()
-            {
-                const int length = 5;
-                const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                lock (Random)
-                {
-                    char[] chars = new char[length];
-                    for (int i = 0; i < length; i++)
-                    {
-                        chars[i] = validChars[Random.Next(validChars.Length)];
-                    }
-                    return new string(chars);
-                }
-            }
         }
     }
 }

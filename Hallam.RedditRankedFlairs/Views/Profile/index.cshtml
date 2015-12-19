@@ -44,20 +44,6 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var pendingReg in Model.Registrations)
-        {
-            <tr>
-                <td>@pendingReg.Region</td>
-                <td>@pendingReg.SummonerName</td>
-                <td>&nbsp;</td>
-                <td>
-                    <button type="button" class="label label-danger">
-                        <span><i class="fa fa-exclamation"></i> Validation Required</span>
-                    </button>
-                </td>
-            </tr>
-        }
-
         @foreach (var summoner in Model.User.Summoners)
         {
             <tr>
