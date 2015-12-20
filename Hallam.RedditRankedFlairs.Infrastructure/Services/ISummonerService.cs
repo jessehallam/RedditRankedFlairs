@@ -9,6 +9,16 @@ namespace Hallam.RedditRankedFlairs.Services
     public interface ISummonerService
     {
         /// <summary>
+        ///     Adds a summoner to a user asynchronously.
+        /// </summary>
+        /// <param name="user">The user who owns the summoner.</param>
+        /// <param name="summonerId">The summoner ID.</param>
+        /// <param name="region">The region.</param>
+        /// <param name="name">The summoner name.</param>
+        /// <returns>A new summoner object.</returns>
+        Task<Summoner> AddSummonerAsync(User user, int summonerId, string region, string name);
+
+            /// <summary>
         ///     Finds a summoner asynchronously.
         /// </summary>
         /// <param name="region">The summoner region.</param>
@@ -31,5 +41,12 @@ namespace Hallam.RedditRankedFlairs.Services
         /// <param name="summonerName">The summoner name.</param>
         /// <returns>True indicates success.</returns>
         Task<bool> RemoveAsync(string region, string summonerName);
+
+        /// <summary>
+        ///     Assigns the summoner as its user's active summoner asynchronously.
+        /// </summary>
+        /// <param name="summoner">The summoner to assign.</param>
+        /// <returns>True indicates success.</returns>
+        Task<bool> SetActiveSummonerAsync(Summoner summoner);
     }
 }

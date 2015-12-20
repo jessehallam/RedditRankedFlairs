@@ -39,6 +39,12 @@ namespace Hallam.RedditRankedFlairs.Services.Riot
             IEnumerable<KeyValuePair<string, string>> parameters = null)
         {
             var response = await SendRequestInternalAsync(region, relativeUri, parameters);
+            // not found is a successful status code, indicating that the request was successful
+            // but the entity did not exist (invalid summoner id, etc).
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
             response.EnsureSuccessStatusCode();
             return JObject.Parse(await response.Content.ReadAsStringAsync());
         }
@@ -77,19 +83,24 @@ namespace Hallam.RedditRankedFlairs.Services.Riot
                 var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
                 await EnforceRateLimitAsync(region);
                 var response = await _httpClient.SendAsync(request);
-
-                if (response.IsSuccessStatusCode)
+                
+                switch ((int) response.StatusCode)
                 {
-                    return response;
-                }
+                    case 404:
+                    case 200:
+                        // 404 and 200 are both considered "success" status codes, with
+                        // 404 indicating the request was successful but the entity did not exist (invalid summoner id, for example)
+                        return response;
 
-                // If the response code indicates Riot's error and we have attempts remaining,
-                // retry the request.
-                if (attempts > 0 && (response.StatusCode == HttpStatusCode.InternalServerError ||
-                                     response.StatusCode == HttpStatusCode.ServiceUnavailable))
-                {
-                    await Task.Delay(RetryInterval);
-                    continue;
+                    case 500:
+                    case 503:
+                        // 500 and 503 indicate an error on Riot's API. If the attempts aren't depleted, we'll requeue and try again.
+                        if (attempts > 0)
+                        {
+                            await Task.Delay(RetryInterval);
+                            continue;
+                        }
+                        break;
                 }
 
                 throw new RiotHttpException(response.StatusCode);

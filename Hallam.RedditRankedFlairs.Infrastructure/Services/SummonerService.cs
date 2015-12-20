@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using Hallam.RedditRankedFlairs.Data;
 
@@ -12,6 +13,20 @@ namespace Hallam.RedditRankedFlairs.Services
         {
             UnitOfWork = unitOfWork;
         }
+
+        public async Task<Summoner> AddSummonerAsync(User user, int summonerId, string region, string name)
+        {
+            user.Summoners.Add(new Summoner
+            {
+                LeagueInfo = new LeagueInfo(),
+                Name = name,
+                Region = region,
+                SummonerId = summonerId,
+                User = user
+            });
+            await UnitOfWork.SaveChangesAsync();
+            return user.Summoners.First(summoner => summoner.SummonerId == summonerId);
+        } 
 
         public Task<Summoner> FindAsync(string region, string summonerName)
         {
@@ -34,5 +49,11 @@ namespace Hallam.RedditRankedFlairs.Services
             UnitOfWork.Summoners.Remove(entity);
             return await UnitOfWork.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> SetActiveSummonerAsync(Summoner summoner)
+        {
+            summoner.User.ActiveSummoner = summoner;
+            return await UnitOfWork.SaveChangesAsync() > 0;
+        } 
     }
 }

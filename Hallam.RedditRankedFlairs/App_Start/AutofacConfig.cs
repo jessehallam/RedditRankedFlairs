@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Configuration;
+using System.Web.Http;
 using System.Web.Mvc;
 using Autofac;
 using Autofac.Integration.Mvc;
+using Autofac.Integration.WebApi;
 using Hallam.RedditRankedFlairs.Data;
 using Hallam.RedditRankedFlairs.Services;
 using Hallam.RedditRankedFlairs.Services.Riot;
@@ -15,6 +17,10 @@ namespace Hallam.RedditRankedFlairs
         {
             // MVC controllers
             builder.RegisterControllers(typeof (MvcApplication).Assembly);
+
+            // Web API
+            builder.RegisterApiControllers(typeof (MvcApplication).Assembly);
+            builder.RegisterWebApiFilterProvider(GlobalConfiguration.Configuration);
 
             // DI model binders
             builder.RegisterModelBinders(typeof (MvcApplication).Assembly);
@@ -54,6 +60,9 @@ namespace Hallam.RedditRankedFlairs
         {
             // Replace the MVC dependency resolver
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+
+            // Replace the WebAPI dependency resolver
+            GlobalConfiguration.Configuration.DependencyResolver = new AutofacWebApiDependencyResolver(container);
         }
     }
 }
