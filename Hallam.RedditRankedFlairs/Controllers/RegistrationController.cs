@@ -25,12 +25,6 @@ namespace Hallam.RedditRankedFlairs.Controllers
         protected ISummonerService Summoners { get; set; }
         protected IUserService Users { get; set; }
 
-        public class ValidationModel
-        {
-            [Required]
-            public string State { get; set; }
-        }
-
         public RegistrationController(IRiotService riotService, ISummonerService summonerService,
             IUserService userService)
         {
@@ -56,18 +50,10 @@ namespace Hallam.RedditRankedFlairs.Controllers
                 // Summoner MUST NOT be registered.
                 if (await Summoners.IsSummonerRegistered(model.Region, model.SummonerName))
                     return Conflict("Summoner is already registered.");
-
-                var context = new RegistrationContext
-                {
-                    Region = model.Region,
-                    SummonerId = summoner.Id,
-                    SummonerName = summoner.Name
-                };
-                context.GenerateRandomValidationCode();
+                
                 return Ok(new
                 {
-                    code = context.ValidationCode,
-                    state = SecurityUtil.Protect(context.ToJson().ToString(), ReasonString)
+                    code = RegistrationCode.Generate((await Users.GetUserAsync()).Name, summoner.Id, model.Region)
                 });
             }
             catch (RiotHttpException e)
@@ -83,52 +69,43 @@ namespace Hallam.RedditRankedFlairs.Controllers
         }
 
         [HttpPost, Route("profile/api/validate")]
-        public async Task<IHttpActionResult> Validate(ValidationModel model)
+        public async Task<IHttpActionResult> Validate(SummonerModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                RegistrationContext context;
-
-                // Try to unpack the state object.
-                if (!RegistrationContext.TryGetRegistrationContext(model.State, out context) || !context.IsValid)
-                {
-                    return BadRequest("Invalid state.");
-                }
-
                 // Summoner MUST exist.
-                var riotSummoner = await Riot.FindSummonerAsync(context.Region, context.SummonerName);
+                var riotSummoner = await Riot.FindSummonerAsync(model.Region, model.SummonerName);
+                var user = await Users.GetUserAsync();
+
                 if (riotSummoner == null)
                 {
                     return Conflict("Summoner not found.");
                 }
 
                 // Summoner MUST NOT be registered.
-                if (await Summoners.IsSummonerRegistered(context.Region, context.SummonerName))
+                if (await Summoners.IsSummonerRegistered(model.Region, model.SummonerName))
                 {
                     return Conflict("Summoner is already registered.");
                 }
 
-                var runePages = await Riot.GetRunePagesAsync(context.Region, context.SummonerId);
-                var runePage = runePages.First();
+                var runePages = await Riot.GetRunePagesAsync(model.Region, riotSummoner.Id);
+                var code = RegistrationCode.Generate(user.Name, riotSummoner.Id, model.Region);
 
-                // Validation Code MUST match.
-                if (!string.Equals(runePage.Name, context.ValidationCode, StringComparison.InvariantCultureIgnoreCase))
+                if (!runePages.Any(page => string.Equals(page.Name, code, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     return StatusCode(HttpStatusCode.ExpectationFailed);
                 }
 
                 // Create the data entity and associate it with the current user
-                var currentUser = await Users.GetUserAsync();
-                var currentSummoner = await Summoners.AddSummonerAsync(currentUser, 
-                    context.SummonerId, context.Region, context.SummonerName);
+                var currentSummoner =
+                    await Summoners.AddSummonerAsync(user, riotSummoner.Id, model.Region, riotSummoner.Name);
 
                 // If the user doesn't have an active summoner, assign the new summoner as active.
-                if (currentUser.ActiveSummoner == null)
+                if (user.ActiveSummoner == null)
                     await Summoners.SetActiveSummonerAsync(currentSummoner);
-                
                 return Ok();
             }
             catch (RiotHttpException e)
@@ -154,57 +131,24 @@ namespace Hallam.RedditRankedFlairs.Controllers
                 () => Riot.FindSummonerAsync(region, summonerName));
         }
 
-        private class RegistrationContext
+        private static class RegistrationCode
         {
-            [JsonIgnore]
-            public bool IsValid => !string.IsNullOrEmpty(Region) &&
-                                   SummonerId != 0 &&
-                                   !string.IsNullOrEmpty(SummonerName) &&
-                                   !string.IsNullOrEmpty(ValidationCode);
-
-            public string Region { get; set; }
-            public int SummonerId { get; set; }
-            public string SummonerName { get; set; }
-            public string ValidationCode { get; set; }
-
-            public void GenerateRandomValidationCode()
+            public static string Generate(string user, int summonerId, string region)
             {
-                const int length = 5;
-                const string validationChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                char[] chars = new char[length];
-                lock (Random)
-                {
-                    for (int i = 0; i < length; i++)
-                    {
-                        chars[i] = validationChars[Random.Next(validationChars.Length)];
-                    }
-                    ValidationCode = new string(chars);
-                }
+                var nonce = string.Concat(user, ":", summonerId, ":", region).ToLowerInvariant();
+                var hash = Hash(nonce);
+                return ToHexString(hash);
             }
 
-            public JObject ToJson()
+            private static uint Hash(string s)
             {
-                return JObject.FromObject(this);
+                return s.Aggregate<char, uint>(5381, (current, c) => ((current << 5) + current) + c);
             }
 
-            public static bool TryGetRegistrationContext(string state, out RegistrationContext context)
+            private static string ToHexString(uint value)
             {
-                try
-                {
-                    var contextJson = SecurityUtil.Unprotect(state, ReasonString);
-                    context = FromJson(contextJson);
-                    return true;
-                }
-                catch
-                {
-                    context = null;
-                    return false;
-                }
-            }
-
-            private static RegistrationContext FromJson(string json)
-            {
-                return JsonConvert.DeserializeObject<RegistrationContext>(json);
+                var bytes = BitConverter.GetBytes(value);
+                return string.Join("", bytes.Select(x => x.ToString("X2")));
             }
         }
     }

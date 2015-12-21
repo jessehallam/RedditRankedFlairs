@@ -1,16 +1,42 @@
 ﻿@using Hallam.RedditRankedFlairs.Models
-<div id="register-modal" class="modal modal-fade-in">
+<div id="register-modal" class="modal modal-fade-in" ng-controller="RegisterController">
     <div class="modal-content">
         <h3>Register Summoner</h3>
-        <form action="~/profile/register" method="post">
-            <input type="text" name="summonerName" id="summonerName" placeholder="Summoner Name">
-            <select name="region" id="region">
+        <p>
+            Use this dialog to link your summoner to your Reddit account. Linking your summoner will allow you to
+            display ranked flairs on some qualifying sub-Reddits.
+        </p>
+        <form>
+            <input type="text" name="summonerName" id="summonerName" placeholder="Summoner Name" ng-model="summonerName">
+            <select name="region" id="region" ng-model="region">
                 @foreach (var region in SummonerModel.AllRegions)
                 {
                     <option value="@region">@region</option>
                 }
             </select>
-            <button type="submit">Continue</button>
+            <div class="status">
+                <span ng-show="status" ng-class="{'error': status.error}">{{status.error || status.msg}}</span>
+            </div>
+            <button type="submit" ng-disabled="!summonerName || !region || busy" ng-click="ok()">
+                <i class="fa fa-spin fa-spinner" ng-show="busy"></i> {{ busy ? 'Please wait...' : 'Confirm' }}
+            </button>
         </form>
+    </div>
+</div>
+
+<div id="validation-modal" class="modal modal-fade-in" ng-controller="ValidationController">
+    <div class="modal-content">
+        <h3>Validate Summoner</h3>
+        <p>
+            <em>Almost done!</em> Validate your summoner by changing one of your <em>rune pages</em> to the
+            following code:
+        </p>
+        <blockquote>{{registration.code}}</blockquote>
+        <div class="status">
+            <span ng-show="status" ng-class="{'error': status.error}">{{status.error || status.msg}}</span>
+        </div>
+        <button type="button" ng-disabled="busy" ng-click="ok()">
+            <i class="fa fa-spin fa-spinner" ng-show="busy"></i> {{ busy ? 'Please wait...' : 'Confirm' }}
+        </button>
     </div>
 </div>

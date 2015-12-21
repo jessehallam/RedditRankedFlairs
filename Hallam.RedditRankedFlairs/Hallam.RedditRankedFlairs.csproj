@@ -162,10 +162,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\js\angular-resource.js" />
+    <Content Include="Content\js\angular-resource.min.js" />
     <Content Include="Content\js\angular.js" />
     <Content Include="Content\js\angular.min.js" />
     <Content Include="Content\js\jquery.min.js" />
     <Content Include="Content\js\modal.js" />
+    <Content Include="Content\js\profile.js" />
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -176,7 +179,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="CacheUtil.cs" />
     <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\ProfileApiController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\ProfileSummonerController.cs" />
     <Compile Include="Controllers\RegistrationController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -202,6 +207,7 @@
     <Content Include="Views\Profile\index.cshtml" />
     <Content Include="Views\_layout.cshtml" />
     <Content Include="Views\Profile\_register.cshtml" />
+    <Content Include="Content\js\angular-resource.min.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -211,6 +217,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\ProfileSummoner\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hallam.RedditRankedFlairs.Data\Hallam.RedditRankedFlairs.Data.csproj">

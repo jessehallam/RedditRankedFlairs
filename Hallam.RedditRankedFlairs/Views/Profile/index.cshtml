@@ -2,28 +2,21 @@
 @{
     Layout = "~/Views/_layout.cshtml";
     Page.Title = "Profile";
+    Page.AngularApp = "Profile";
 }
 @section head {
     <link rel="stylesheet" href="~/Content/Styles/profile.less">
     <link rel="stylesheet" href="~/Content/Styles/modal.less">
     <script src="~/Content/js/modal.js"></script>
+    <script src="~/Content/js/profile.js"></script>
 }
 
 <h2>Profile for /u/@User.Identity.Name</h2>
 
-@if (!string.IsNullOrEmpty(Request.QueryString["error"]))
-{
-    <div class="notify notify-error">
-        @Request.QueryString["error"]
-    </div>
-}
-
-@if (!string.IsNullOrEmpty(Request.QueryString["success"]))
-{
-    <div class="notify notify-success">
-        @Request.QueryString["success"]
-    </div>
-}
+<div class="notify" ng-controller="NotificationController" ng-show="notification.type"
+     ng-class="{'error': 'notify-error', 'success': 'notify-success'}[notification.type]">
+    {{notification.msg}}
+</div>
 
 <div style="margin-bottom: 10px">
     <button type="button" onclick="modal('#register-modal')">
@@ -31,12 +24,20 @@
     </button>
 </div>
 
-
 @Html.Partial("_register")
+
+@if (Model.User.Summoners.Any(s => !s.LeagueInfo.UpdatedTime.HasValue))
+{
+    <div class="notify notify-info">
+        <strong>League data is updating.</strong> A summoner's league is being updated. This typically takes a few minutes, 
+        but can take longer from time to time.
+    </div>
+}
 
 <table class="table">
     <thead>
         <tr>
+            <th style="width: 6%">&nbsp;</th>
             <th style="width: 18%">Region</th>
             <th style="width: 24%">Summoner Name</th>
             <th style="width: 24%">League</th>
@@ -47,15 +48,34 @@
         @foreach (var summoner in Model.User.Summoners)
         {
             <tr>
-                <td>@summoner.Region</td>
-                <td>@summoner.Name</td>
-                <td><em>Updating...</em></td>
                 <td>
-                    <span class="label label-success">Validated</span>
-                    @if (summoner.Id == Model.User.ActiveSummoner.Id)
+                    @*
+                    @if (Model.User.ActiveSummoner?.Id != summoner.Id)
+                    {
+                        <a href="/profile/summoner/@summoner.Region/@summoner.SummonerId/activate" title="Activate Summoner">
+                            <i class="fa fa-star"></i>
+                        </a>
+                    }
+
+                    <a href="/profile/summoner/@summoner.Region/@summoner.SummonerId/delete" title="Unlink Summoner">
+                        <i class="fa fa-trash"></i>
+                    </a>*@
+                </td>
+                <td>@summoner.Region.ToUpperInvariant()</td>
+                <td>@summoner.Name</td>
+                <td>
+                    @{
+                        var s = @LeagueUtil.Stringify(summoner.LeagueInfo);
+                        Write(!string.IsNullOrEmpty(s) ? s : "Updating...");
+                    }
+
+                </td>
+                <td>
+                    @if (summoner.Id == Model.User.ActiveSummoner?.Id)
                     {
                         <span class="label label-primary">Active</span>
                     }
+                    <span class="label label-success">Verified</span>
                 </td>
             </tr>
         }

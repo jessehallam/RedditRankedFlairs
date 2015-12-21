@@ -16,7 +16,8 @@
     <link rel="stylesheet" href="~/Content/Styles/site.less">
 
     <script src="~/Content/js/jquery.min.js"></script>
-    <script src="~/Content/js/angular@(Page.DebugMode ? ".min" : "").js"></script>
+    <script src="~/Content/js/angular@(Page.DebugMode ? "" : ".min").js"></script>
+    <script src="~/Content/js/angular-resource@(Page.DebugMode ? "" : ".min").js"></script>
 
     @RenderSection("head", false)
 </head>
@@ -32,10 +33,11 @@
                     <ul>
                         <li><a href="~/">Manage Profile</a></li>
                         <li><a href="~/about">About</a></li>
+                        @*
                         @if (User.IsInRole("admin") || User.IsInRole("moderator"))
                         {
                             <li><a href="~/admin">Admin</a></li>
-                        }
+                        }*@
                     </ul>
                 </nav>
             </div>

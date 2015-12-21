@@ -27,7 +27,8 @@ namespace Hallam.RedditRankedFlairs
             if (item == null)
             {
                 item = await createItem();
-                HttpRuntime.Cache[key] = item;
+                if (item != null)
+                    HttpRuntime.Cache[key] = item;
             }
             return await Task.FromResult(item);
         }

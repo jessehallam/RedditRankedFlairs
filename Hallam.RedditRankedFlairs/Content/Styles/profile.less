@@ -14,23 +14,15 @@ tfoot td {
 
 .modal {
     background-color: rgba(0, 0, 0, 0.88);
+    max-width: 440px;
     padding: 25px;
 
     p {
-        font-size: 16px;
-    }
-
-    h3 {
-        font-size: 28px;
-        font-weight: normal;
-        line-height: 1;
+        font-size: 13px;
         margin-bottom: 10px;
-        text-transform: uppercase;
+        white-space: normal;
     }
-}
 
-#register-modal {
-    max-width: 440px;
     input[type="text"] {
         border: 0;
         border-radius: 3px;
@@ -42,6 +34,7 @@ tfoot td {
         padding: 8px;
         width: 100%;
     }
+
     select {
         border: 0;
         border-radius: 3px;
@@ -53,6 +46,7 @@ tfoot td {
         padding: 7px;
         width: 100%;
     }
+
     button {
         display: block;
         font-size: 16px;
@@ -64,6 +58,41 @@ tfoot td {
         overflow: hidden;
         white-space: nowrap;
     }
+
+    .status {
+        margin-bottom: 10px;
+    }
+
+    h3 {
+        font-size: 28px;
+        font-weight: normal;
+        line-height: 1;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+
+    em {
+        color: @button-background-color;
+        font-style: normal;
+        font-weight: bold;
+    }
+
+    blockquote {
+        color: @button-background-color;
+        font-family: monospace;
+        font-size: 21px;
+        letter-spacing: .08em;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+}
+
+/*
+#register-modal {
+    max-width: 440px;
+
+
+    
 
     .register-step {
         display: inline-block;
@@ -77,12 +106,10 @@ tfoot td {
         width: 0px;
     }
 
-    .status {
-        margin-bottom: 10px;
-    }
+    
 
     p {
-        font-size: 16px;
+        font-size: 12px;
         margin-bottom: 10px;
         white-space: normal;
     }
@@ -97,15 +124,8 @@ tfoot td {
         font-style: normal;
         font-weight: bold;
     }
-    blockquote {
-        color: @button-background-color;
-        font-family: monospace;
-        font-size: 21px;
-        letter-spacing: .08em;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-}
+    
+}*/
 
 #subscribe-dialog {
     ul {
