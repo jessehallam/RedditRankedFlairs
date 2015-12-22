@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Configuration;
-using System.Web.Http;
 using System.Web.Mvc;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
 using Hallam.RedditRankedFlairs.Data;
+using Hallam.RedditRankedFlairs.Jobs;
 using Hallam.RedditRankedFlairs.Services;
 using Hallam.RedditRankedFlairs.Services.Riot;
+using Hangfire;
+using GlobalConfiguration = System.Web.Http.GlobalConfiguration;
 
 namespace Hallam.RedditRankedFlairs
 {
@@ -50,6 +52,9 @@ namespace Hallam.RedditRankedFlairs
                 }
             }).As(typeof (IRiotService)).SingleInstance();
 
+            // Jobs
+            builder.RegisterType(typeof (LeagueUpdateJob)).InstancePerLifetimeScope();
+
             // Data persistance
             builder.RegisterType(typeof (UnitOfWork)).As(typeof (IUnitOfWork)).InstancePerLifetimeScope();
 
@@ -63,6 +68,14 @@ namespace Hallam.RedditRankedFlairs
 
             // Replace the WebAPI dependency resolver
             GlobalConfiguration.Configuration.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+
+            // Replace the Hangfire activator
+            ConfigureHangfire(Hangfire.GlobalConfiguration.Configuration, container);
+        }
+
+        private static void ConfigureHangfire(IGlobalConfiguration config, IContainer container)
+        {
+            config.UseAutofacActivator(container);
         }
     }
 }

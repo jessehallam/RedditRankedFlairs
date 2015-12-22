@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Hallam.RedditRankedFlairs.Data;
@@ -53,6 +54,14 @@ namespace Hallam.RedditRankedFlairs.Services
         public async Task<bool> SetActiveSummonerAsync(Summoner summoner)
         {
             summoner.User.ActiveSummoner = summoner;
+            return await UnitOfWork.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> UpdateLeagueAsync(Summoner summoner, TierName tier, int division)
+        {
+            summoner.LeagueInfo.Division = division;
+            summoner.LeagueInfo.Tier = tier;
+            summoner.LeagueInfo.UpdatedTime = DateTimeOffset.Now;
             return await UnitOfWork.SaveChangesAsync() > 0;
         } 
     }

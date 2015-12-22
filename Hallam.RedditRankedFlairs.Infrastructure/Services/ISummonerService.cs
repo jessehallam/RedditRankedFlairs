@@ -48,5 +48,14 @@ namespace Hallam.RedditRankedFlairs.Services
         /// <param name="summoner">The summoner to assign.</param>
         /// <returns>True indicates success.</returns>
         Task<bool> SetActiveSummonerAsync(Summoner summoner);
+
+        /// <summary>
+        ///     Updates the league standing for a summoner.
+        /// </summary>
+        /// <param name="summoner">The summoner.</param>
+        /// <param name="tier">The league tier.</param>
+        /// <param name="division">The league division.</param>
+        /// <returns>True indicates success.</returns>
+        Task<bool> UpdateLeagueAsync(Summoner summoner, TierName tier, int division);
     }
 }

@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Configuration;
 using System.Security.Claims;
+using System.Web.Http;
 using Hallam.RedditRankedFlairs;
+using Hallam.RedditRankedFlairs.Security;
+using Hangfire;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
 using Owin.Security.Providers.Reddit;
+using GlobalConfiguration = Hangfire.GlobalConfiguration;
 
 [assembly: OwinStartup(typeof (OwinStartup))]
 
@@ -29,6 +33,13 @@ namespace Hallam.RedditRankedFlairs
 
             // Enable the Reddit authentication provider.
             app.UseRedditAuthentication(GetRedditOptions());
+
+            GlobalConfiguration.Configuration.UseSqlServerStorage("Hangfire");
+            app.UseHangfireDashboard("/Hangfire", new DashboardOptions
+            {
+                AuthorizationFilters = new[] {new HangfireDashboardAuthorizationFilter(),}
+            });
+            app.UseHangfireServer();
         }
 
         private static RedditAuthenticationOptions GetRedditOptions()
