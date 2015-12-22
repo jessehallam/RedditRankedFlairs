@@ -18,7 +18,14 @@ namespace Hallam.RedditRankedFlairs.Services
         /// <returns>A new summoner object.</returns>
         Task<Summoner> AddSummonerAsync(User user, int summonerId, string region, string name);
 
-            /// <summary>
+        /// <summary>
+        ///     Finds a summoner asynchronously.
+        /// </summary>
+        /// <param name="id">The identifier of the summoner.</param>
+        /// <returns>A summoner object.</returns>
+        Task<Summoner> FindAsync(int id);
+
+        /// <summary>
         ///     Finds a summoner asynchronously.
         /// </summary>
         /// <param name="region">The summoner region.</param>

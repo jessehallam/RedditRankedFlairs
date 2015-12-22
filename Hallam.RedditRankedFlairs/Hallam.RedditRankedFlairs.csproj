@@ -193,7 +193,6 @@
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\ProfileApiController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
-    <Compile Include="Controllers\ProfileSummonerController.cs" />
     <Compile Include="Controllers\RegistrationController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

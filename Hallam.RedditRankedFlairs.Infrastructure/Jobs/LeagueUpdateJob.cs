@@ -24,46 +24,31 @@ namespace Hallam.RedditRankedFlairs.Jobs
             _summoners = summoners;
         }
 
-        public void Execute(int userId, int summonerId)
+        public void Execute(int summonerId)
         {
-            var task = ExecuteInternalAsync(userId, summonerId);
-            task.Wait();
+            ExecuteInternal(summonerId).Wait();
         }
 
-        private async Task ExecuteInternalAsync(int userId, int summonerId)
+        private async Task ExecuteInternal(int summonerId)
         {
-            var user = await _users.FindAsync(userId);
-            var summoner = user?.Summoners.FirstOrDefault(s => s.Id == summonerId);
-
-            if (summoner == null) return;
+            var summoner = await _summoners.FindAsync(summonerId);
+            if (summoner == null)
+                return;
 
             var leagues = await _riot.GetLeaguesAsync(summoner.Region, summoner.SummonerId);
-            var solo = leagues?.FirstOrDefault(l => l.Queue == QueueType.RANKED_SOLO_5x5);
+            var solo = leagues?.FirstOrDefault(league => league.Queue == QueueType.RANKED_SOLO_5x5);
 
-            if (solo != null)
+            if (solo == null)
             {
-                var id = summoner.SummonerId.ToString();
-                var entry = solo.Entries.FirstOrDefault(e => e.PlayerOrTeamId == id);
-
-                if (entry != null)
-                {
-                    await _summoners.UpdateLeagueAsync(summoner, 
-                        ParseTierName(solo.Tier), 
-                        ParseDivision(entry.Division));
-                    return;
-                }
+                await _summoners.UpdateLeagueAsync(summoner, TierName.Unranked, 0);
             }
-            await _summoners.UpdateLeagueAsync(summoner, TierName.Unranked, 0);
-        }
-
-        private static int ParseDivision(DivisionType division)
-        {
-            return (int) division;
-        }
-
-        private static TierName ParseTierName(TierType tier)
-        {
-            return (TierName) Enum.Parse(typeof (TierName), tier.ToString(), true);
+            else
+            {
+                var entry = solo.Entries.First(e => e.PlayerOrTeamId == summoner.SummonerId.ToString());
+                var division = (int) entry.Division;
+                var tier = (TierName) Enum.Parse(typeof (TierName), solo.Tier.ToString(), true);
+                await _summoners.UpdateLeagueAsync(summoner, tier, division);
+            }
         }
     }
 }

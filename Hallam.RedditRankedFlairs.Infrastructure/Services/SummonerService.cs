@@ -27,7 +27,13 @@ namespace Hallam.RedditRankedFlairs.Services
             });
             await UnitOfWork.SaveChangesAsync();
             return user.Summoners.First(summoner => summoner.SummonerId == summonerId);
-        } 
+        }
+
+        public Task<Summoner> FindAsync(int id)
+        {
+            return UnitOfWork.Summoners.FirstOrDefaultAsync(summoner =>
+                summoner.Id == id);
+        }
 
         public Task<Summoner> FindAsync(string region, string summonerName)
         {
@@ -47,6 +53,13 @@ namespace Hallam.RedditRankedFlairs.Services
         {
             var entity = await FindAsync(region, summonerName);
             if (entity == null) return false;
+            if (entity.User.ActiveSummoner.Id == entity.Id)
+            {
+                entity.User.ActiveSummoner = entity.User.Summoners.Count == 1
+                    ? null
+                    : entity.User.Summoners.First(s => s.Id != entity.Id);
+            }
+            UnitOfWork.Leagues.Remove(entity.LeagueInfo);
             UnitOfWork.Summoners.Remove(entity);
             return await UnitOfWork.SaveChangesAsync() > 0;
         }

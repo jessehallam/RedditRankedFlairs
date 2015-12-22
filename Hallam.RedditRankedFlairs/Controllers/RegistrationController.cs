@@ -6,9 +6,11 @@ using System.Net.Configuration;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Hallam.RedditRankedFlairs.Data;
+using Hallam.RedditRankedFlairs.Jobs;
 using Hallam.RedditRankedFlairs.Models;
 using Hallam.RedditRankedFlairs.Services;
 using Hallam.RedditRankedFlairs.Services.Riot;
+using Hangfire;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Summoner = Hallam.RedditRankedFlairs.Riot.Summoner;
@@ -106,6 +108,9 @@ namespace Hallam.RedditRankedFlairs.Controllers
                 // If the user doesn't have an active summoner, assign the new summoner as active.
                 if (user.ActiveSummoner == null)
                     await Summoners.SetActiveSummonerAsync(currentSummoner);
+
+                // Queue up the league update.
+                BackgroundJob.Enqueue<LeagueUpdateJob>(job => job.Execute(currentSummoner.Id));
                 return Ok();
             }
             catch (RiotHttpException e)
