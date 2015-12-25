@@ -10,6 +10,8 @@ namespace Hallam.RedditRankedFlairs.Services
     /// </summary>
     public interface IRedditService
     {
+        Task<ICollection<string>> GetSubRedditsAsync(SubRedditKind kind);
+
         /// <summary>
         ///     Sets the user flair for a user on a subreddit.
         /// </summary>

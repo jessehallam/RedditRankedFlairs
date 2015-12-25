@@ -17,6 +17,32 @@ namespace Hallam.RedditRankedFlairs.Services
             _requester = requester;
         }
 
+        public async Task<ICollection<string>> GetSubRedditsAsync(SubRedditKind kind)
+        {
+            var uri = $"{BaseUri}/subreddits/mine/{kind.ToString().ToLowerInvariant()}";
+            var results = new List<string>();
+            var after = (string) null;
+
+            while (true)
+            {
+                var data = after == null
+                    ? null
+                    : new[]
+                    {
+                        new KeyValuePair<string, string>("after", after), 
+                    };
+                var listing = await _requester.GetAsync(uri, data);
+                var content = listing["data"];
+                after = (string) content["after"];
+                results.AddRange(from item in content["children"]
+                                 where (string) item["kind"] == "t5"
+                                 select (string) item["display_name"]);
+
+                if (after == null) break;
+            }
+            return results;
+        } 
+
         public async Task<bool> SetUserFlairAsync(string subreddit, string name, string text, string css = null)
         {
             var uri = $"{BaseUri}/r/{subreddit}/api/flair";

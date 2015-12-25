@@ -146,10 +146,10 @@
             go: function () {
                 $notify.waiting('Detecting subscriptions...');
                 $scope.autoDetect.busy = true;
-                $ajax.post('/adminPanel/api/subscriptions?refresh=true',
+                $ajax.post('/adminPanel/api/moderatorOf',
                     function (success, data, status, statusText) {
                         if (!success) { $notify.error('Error detecting subscriptions:' + data.error); }
-
+                        console.log(data);
                     });
             }
         };

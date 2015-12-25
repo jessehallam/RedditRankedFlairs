@@ -7,6 +7,7 @@ using Autofac.Integration.WebApi;
 using Hallam.RedditRankedFlairs.Data;
 using Hallam.RedditRankedFlairs.Jobs;
 using Hallam.RedditRankedFlairs.Services;
+using Hallam.RedditRankedFlairs.Services.Reddit;
 using Hallam.RedditRankedFlairs.Services.Riot;
 using Hangfire;
 using GlobalConfiguration = System.Web.Http.GlobalConfiguration;
@@ -42,6 +43,7 @@ namespace Hallam.RedditRankedFlairs
             builder.RegisterType(typeof (UserService)).As(typeof (IUserService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (SummonerService)).As(typeof (ISummonerService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (SubRedditService)).As(typeof (ISubRedditService)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof (RedditService)).As(typeof (IRedditService)).InstancePerLifetimeScope();
             builder.Register(context => new RiotService
             {
                 WebRequester = new RiotWebRequester
@@ -52,6 +54,16 @@ namespace Hallam.RedditRankedFlairs
                     RetryInterval = TimeSpan.Parse(ConfigurationManager.AppSettings["riot.retryInterval"])
                 }
             }).As(typeof (IRiotService)).SingleInstance();
+
+            // Reddit WebRequester
+            builder.Register(context =>
+            {
+                var s = ConfigurationManager.AppSettings;
+                return new RedditWebRequester(s["reddit.script.clientId"], 
+                    s["reddit.script.clientSecret"],
+                    s["reddit.modUserName"], 
+                    s["reddit.modPassword"]);
+            }).SingleInstance();
 
             // Jobs
             builder.RegisterType(typeof (LeagueUpdateJob)).InstancePerLifetimeScope();

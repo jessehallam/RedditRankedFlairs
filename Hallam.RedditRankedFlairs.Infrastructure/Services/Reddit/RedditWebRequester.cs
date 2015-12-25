@@ -12,7 +12,7 @@ namespace Hallam.RedditRankedFlairs.Services.Reddit
     public class RedditWebRequester
     {
         private const string AccessTokenUrl = "https://www.reddit.com/api/v1/access_token";
-        private const string UserAgent = "aspnet:hallam.redditrankedflairs:v4.0.0 (by /u/kivinkujata)";
+        private static readonly string UserAgent = Uri.EscapeDataString("aspnet:hallam.redditrankedflairs:v4.0.0 (by /u/kivinkujata)");
         private readonly HttpClient _httpClient = new HttpClient();
 
         private readonly string _clientId;
