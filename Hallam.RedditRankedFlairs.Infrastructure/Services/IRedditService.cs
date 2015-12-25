@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hallam.RedditRankedFlairs.Reddit;
+using Hallam.RedditRankedFlairs.Services.Reddit;
 
 namespace Hallam.RedditRankedFlairs.Services
 {

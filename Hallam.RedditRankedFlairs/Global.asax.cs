@@ -9,8 +9,8 @@ namespace Hallam.RedditRankedFlairs
     {
         protected void Application_Start()
         {
-            AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            AreaRegistration.RegisterAllAreas();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             AutofacConfig.Register(new ContainerBuilder());
         }

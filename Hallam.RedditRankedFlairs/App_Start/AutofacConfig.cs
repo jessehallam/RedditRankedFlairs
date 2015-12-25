@@ -41,6 +41,7 @@ namespace Hallam.RedditRankedFlairs
             builder.RegisterType(typeof (RoleService)).As(typeof (IRoleService)).SingleInstance();
             builder.RegisterType(typeof (UserService)).As(typeof (IUserService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (SummonerService)).As(typeof (ISummonerService)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof (SubRedditService)).As(typeof (ISubRedditService)).InstancePerLifetimeScope();
             builder.Register(context => new RiotService
             {
                 WebRequester = new RiotWebRequester

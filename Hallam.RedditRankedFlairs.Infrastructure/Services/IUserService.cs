@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Hallam.RedditRankedFlairs.Data;
 
@@ -46,7 +47,7 @@ namespace Hallam.RedditRankedFlairs.Services
         /// <returns>A user object.</returns>
         Task<User> FindAsync(int userId);
 
-        /// <summary>
+            /// <summary>
         ///     Removes a user from the repository asynchronously.
         /// </summary>
         /// <param name="userId">The user id.</param>
