@@ -1,0 +1,39 @@
+﻿@using System.Configuration
+@{
+    var modUserName = ConfigurationManager.AppSettings["reddit.modUserName"];
+}
+<div id="subreddits-panel" class="control-panel" ng-controller="SubRedditsController">
+    <button type="button">
+        <i class="fa fa-bars"></i> Link a Sub
+    </button>
+
+    <div id="subreddits-panel-link-dialog" class="modal modal-fade-in">
+        <div class="modal-title">
+            <h3>Link a Sub</h3>
+            <button type="modal-close">&times;</button>
+        </div>
+    </div>
+
+    <table class="table" style="width: 400px">
+        <thead>
+            <tr>
+                <th style="width: 50%">Name</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="sub in subs">
+                <td>{{sub.name}}</td>
+                <td>{{sub.status}}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr ng-show="!subs.length && !loading">
+                <td colspan="2"><i>No subReddits are registered.</i></td>
+            </tr>
+            <tr ng-show="loading">
+                <td colspan="2"><i class="fa fa-spin fa-spinner"></i> <i>Loading...</i></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

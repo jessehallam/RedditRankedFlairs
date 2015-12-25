@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" ng-app="Admin">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>Admin Panel - Reddit Ranked Flairs</title>
+
+        <link rel="stylesheet" href="~/Content/Styles/normalize.less">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="~/Content/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="~/Content/Styles/admin.less">
+        <script src="~/Content/js/jquery.min.js"></script>
+        <script src="~/Content/bootstrap/js/bootstrap.min.js"></script>
+        <script src="~/Content/js/angular.js"></script>
+        <script src="~/Content/js/angular-resource.js"></script>
+        <script src="~/Content/js/admin.js"></script>
+    </head>
+    <body ng-controller="MainController">
+        <header>
+            <div class="brand">
+                <h1>
+                    <a href="#">
+                        <i class="fa fa-industry"></i> Reddit Flair Admin
+                    </a>
+                </h1>
+            </div>
+
+            <div class="toolbar">
+                <ul>
+                    <li class="msg-admin">
+                        <a href="#" title="Message the Admin" data-toggle="tooltip" data-placement="bottom">
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </li>
+                    <li class="task-scheduler">
+                        <a href="#" title="Go to Task Scheduler" data-toggle="tooltip" data-placement="bottom">
+                            <i class="fa fa-tasks"></i>
+                        </a>
+                    </li>
+                    <li class="profile">
+                        <a href="#" title="Go to Profile" data-toggle="tooltip" data-placement="bottom">
+                            <i class="fa fa-user"></i> @User.Identity.Name
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="notify" ng-controller="NotifyController"
+                 ng-class="{'notify-hidden': !message, 'notify-success': success, 'notify-error': error, 'notify-alert': !success && !error}"
+                 ng-click="close()">
+                <div class="notify-backdrop">
+                    <i class="fa" ng-class="{'fa-check': success, 'fa-exclamation-circle': error, 'fa-exclamation': alert}"></i>
+                </div>
+                <i class="fa fa-spin fa-spinner" ng-show="waiting"></i> {{ message }}
+            </div>
+        </header>
+
+        <div class="sidebar">
+            <ul>
+                <li>
+                    <a href="#" ng-click="changePanel('eventlog')">
+                        <i class="fa fa-list"></i> Event Log
+                    </a>
+                </li>
+                <li>
+                    <a href="#" ng-click="changePanel('subreddits')">
+                        <i class="fa fa-heartbeat"></i> Manage Subscriptions
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main">
+            <div class="breadcrumb">
+                <ul>
+                    <li>
+                        <i class="fa fa-home"></i>
+                        <a href="#">
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            {{ panel.title }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="panel-content">
+                @*
+                    Event Log
+                *@
+
+                <div class="panel" id="panel-event-log" ng-class="{'panel-hidden': panel.name != 'eventlog'}">
+                    <div class="panel-header">
+                        <h2>{{ panel.title }}</h2>
+                    </div>
+                </div>
+
+                @*
+                    SubReddit Subscriptions
+                *@
+                <div class="panel" id="panel-subscriptions" ng-class="{'panel-hidden': panel.name != 'subreddits'}"
+                     ng-controller="SubscriptionsController">
+                    <div class="panel-header">
+                        <h2>{{ panel.title }}</h2>
+                    </div>
+
+                    <div class="row">
+                        <button type="button" class="button" ng-click="autoDetect.go()" ng-disabled="autoDetect.busy">
+                            Auto-Detect
+                        </button>
+                    </div>
+
+                    <div class="row">
+                        <table class="table" style="width: 480px">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50%">SubReddit</th>
+                                    <th>Status</th>
+                                    <th>Functions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="sub in subscriptions">
+                                    <td>{{sub.name}}</td>
+                                    <td>{{sub.status}}</td>
+                                    <td>
+                                        <button type="button" class="button">
+                                            <i class="fa fa-minus"></i> Unlink
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr ng-show="loading">
+                                    <td colspan="2"><i class="fa fa-spin fa-spinner"></i> Loading...</td>
+                                </tr>
+                                <tr ng-show="!loading && !subscriptions.length">
+                                    <td colspan="2">No subscriptions to display.</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $('[data-toggle="tooltip"]').tooltip();
+        </script>
+    </body>
+</html>
