@@ -36,7 +36,7 @@ namespace Hallam.RedditRankedFlairs.Services
                 after = (string) content["after"];
                 results.AddRange(from item in content["children"]
                                  where (string) item["kind"] == "t5"
-                                 select (string) item["display_name"]);
+                                 select (string) item["data"]["display_name"]);
 
                 if (after == null) break;
             }
