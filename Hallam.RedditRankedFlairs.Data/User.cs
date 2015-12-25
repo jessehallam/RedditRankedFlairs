@@ -10,7 +10,8 @@ namespace Hallam.RedditRankedFlairs.Data
     /// </summary>
     public class User
     {
-        public DateTimeOffset FlairUpdateRequiredTime { get; set; }
+        public bool FlairUpdateRequired { get; set; }
+        public DateTimeOffset FlairUpdatedTime { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
