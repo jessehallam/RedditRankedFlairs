@@ -9,7 +9,7 @@ namespace Hallam.RedditRankedFlairs
         {
             config.MapHttpAttributeRoutes();
             config.MessageHandlers.Add(new ApiMessageHandler());
-            config.Filters.Add(new RejectEmptyModelFilter());
+            //config.Filters.Add(new RejectEmptyModelFilter());
         }
     }
 }

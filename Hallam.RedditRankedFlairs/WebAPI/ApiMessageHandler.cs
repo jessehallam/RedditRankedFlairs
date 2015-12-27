@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Threading;
@@ -34,9 +35,6 @@ namespace Hallam.RedditRankedFlairs.WebAPI
             [JsonProperty("exception")]
             public object Exception { get; set; }
 
-            [JsonProperty("status")]
-            public int StatusCode { get; set; }
-
             [JsonProperty("validationErrors")]
             public string[] ValidationErrors { get; set; }
         }
@@ -48,39 +46,51 @@ namespace Hallam.RedditRankedFlairs.WebAPI
 
         private HttpResponseMessage GetResponseMessage(HttpRequestMessage request, HttpResponseMessage response)
         {
-            var result = new ResponseDto {StatusCode = (int) response.StatusCode};
             object content;
 
             if (response.TryGetContentValue(out content))
             {
                 var error = content as HttpError;
 
-                if (error != null)
+                if (content is string && !response.IsSuccessStatusCode)
                 {
-                    result.Error = error.Message;
-
-                    if (!string.IsNullOrEmpty(error.ExceptionMessage))
+                    content = new {error = content};
+                }
+                else if (error != null)
+                {
+                    if (response.StatusCode == HttpStatusCode.InternalServerError)
                     {
-#if DEBUG
-                        result.Exception = ResolveExceptionDto(error);
-#endif
-                        if (result.Error == "An error has occurred.")
-                            result.Error = "Internal server error.";
+                        error.Message = "Internal server error.";
                     }
-                    else if (error.ModelState != null)
-                    {
-                        result.ValidationErrors =
-                            error.ModelState.SelectMany(kvp => (IEnumerable<string>) kvp.Value).ToArray();
-                    }
+                    content = GetErrorResult(error);
                 }
                 else
                 {
-                    result.Content = content;
+                    content = new {result = content};
                 }
             }
 
-            response.Content = new ObjectContent(typeof (ResponseDto), result, JsonFormatter);
+            if (content != null)
+                response.Content = new ObjectContent(content.GetType(), content, JsonFormatter);
             return response;
+        }
+
+        private object GetErrorResult(HttpError error)
+        {
+            dynamic r = new ExpandoObject();
+            r.error = error.Message;
+            r.errorDetail = error.MessageDetail;
+            if (error.ModelState != null)
+            {
+                r.errors = error.ModelState.SelectMany(pair => (IEnumerable<string>) pair.Value).ToArray();
+            }
+#if DEBUG
+            if (!string.IsNullOrEmpty(error.ExceptionMessage))
+            {
+                r.exception = ResolveExceptionDto(error);
+            }
+#endif
+            return r;
         }
 
         private object ResolveExceptionDto(HttpError error)

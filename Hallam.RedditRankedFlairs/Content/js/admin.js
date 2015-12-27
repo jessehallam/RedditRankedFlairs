@@ -1,157 +1,168 @@
 ﻿(function (app) {
-    app.factory('$ajax', function ($http) {
+    app.directive('ngTooltip', function () {
         return {
-            get: function (uri, data, callback) {
-                var config;
-                if (callback === undefined) {
-                    callback = data;
+            restrict: 'A',
+            link: function (scope, element, attrs) {
+                var tooltip = attrs.ngTooltip;
+                var match;
+                var placement;
+                if (!tooltip) {
+                    return;
+                }
+                if ((match = /^(top|right|bottom|left),/.exec(tooltip))) {
+                    placement = match[1];
+                    tooltip = tooltip.substr(placement.length + 1);
+                }
+                element.tooltip({
+                    'placement': placement,
+                    'title': tooltip
+                });
+            }
+        };
+    });
+
+    app.factory('ajax', function ($http) {
+        function wrap(promise, handler) {
+            function interceptHandler(response) {
+                if (handler) {
+                    var success = response.status >= 200 && response.status <= 299;
+                    handler(success, response.data, response.status, response.statusText);
+                }
+                if (response.data && response.data.exception) {
+                    console.log(response.data.exception);
+                }
+            }
+            promise.then(interceptHandler, interceptHandler);
+        }
+        return {
+            get: function (uri, data, handler) {
+                if (handler === undefined) {
+                    handler = data;
                     data = undefined;
                 }
                 if (data) {
-                    config = {
-                        params: data
-                    };
+                    data = { config: { params: data } };
                 }
-                var request = $http.get(uri, config);
-                request.then(function (r) {
-                    callback(true, r.data, r.status, r.statusText);
-                }, function (r) {
-                    callback(false, r.data, r.status, r.statusText);
-                });
+                return wrap($http.get(uri, data), handler);
             },
-            post: function (uri, data, callback) {
-                if (callback === undefined) {
-                    callback = data;
+            post: function (uri, data, handler) {
+                if (handler === undefined) {
+                    handler = data;
                     data = undefined;
                 }
-                var request = $http.post(uri, data);
-                request.then(function (r) {
-                    callback(true, r.data, r.status, r.statusText);
-                }, function (r) {
-                    callback(true, r.data, r.status, r.statusText);
-                })
+                return wrap($http.post(uri, data), handler);
             }
         };
     });
 
-    app.factory('$notify', function () {
-        var handlers = [];
-        function Notify(handler) {
-            handlers.push(handler);
+    app.factory('modal', function ($rootScope) {
+        function Modal(id) {
+            this.element = $(id);
+            this.handlers = {};
         }
-        Notify.alert = function (message) {
-            for (var i = 0; i < handlers.length; i += 1) {
-                handlers[i]('alert', message);
+        Modal.prototype = {
+            hide: function () {
+                this.element.removeClass('modal-show');
+            },
+            register: function (eventName, handler) {
+                if (this.handlers[eventName] === undefined) {
+                    this.handlers[eventName] = [];
+                }
+                this.handlers[eventName].push(handler);
+            },
+            show: function () {
+                this.element.addClass('modal-show');
+            },
+            trigger: function (eventName) {
+                if (this.handlers[eventName]) {
+                    var args = Array.prototype.splice(arguments, 1);
+                    this.handlers[eventName].apply(this, args);
+                }
             }
         };
-        Notify.error = function (message) {
-            for (var i = 0; i < handlers.length; i += 1) {
-                handlers[i]('error', message);
-            }
+        return function (id) {
+            return new Modal(id);
         };
-        Notify.success = function (message) {
-            for (var i = 0; i < handlers.length; i += 1) {
-                handlers[i]('success', message);
-            }
-        };
-        Notify.waiting = function (message) {
-            for (var i = 0; i < handlers.length; i += 1) {
-                handlers[i]('waiting', message);
-            }
-        };
-        return Notify;
     });
 
-    app.factory('$panels', function () {
-        function Panel(name, title) {
+    app.factory('notify', function () {
+        var handlers = [];
+        function invoke() {
+            var args = Array.prototype.splice.call(arguments, 0);
+            for (var i = 0; i < handlers.length; i += 1) {
+                handlers[i].apply(this, args);
+            }
+        }
+        return {
+            register: function (handler) { handlers.push(handler); },
+            alert: function (m) { invoke.apply(this, ['alert', m]); },
+            clear: function (m) { invoke.apply(this, []); },
+            error: function (m) { invoke.apply(this, ['error', m]); },
+            success: function (m) { invoke.apply(this, ['success', m]); },
+            waiting: function (m) { invoke.apply(this, ['waiting', m]); }
+        };
+    });
+
+    app.factory('panels', function ($rootScope, $location) {
+        function Panel(name) {
             this.name = name;
-            this.title = title;
-            this.handlers = { open: [], close: [] };
+            this.handlers = {};
         }
         Panel.prototype = {
-            closing: function (handler) {
-                this.handlers.close.push(handler);
+            register: function (eventName, handler) {
+                if (this.handlers[eventName] === undefined) {
+                    this.handlers[eventName] = [];
+                }
+                this.handlers[eventName].push(handler);
             },
-            opening: function (handler) {
-                this.handlers.open.push(handler);
-            },
-            trigger: function (event) {
-                if (this.handlers[event]) {
-                    for (var i = 0; i < this.handlers[event].length; i += 1) {
-                        this.handlers[event][i].call(this);
+            trigger: function (eventName) {
+                if (this.handlers[eventName]) {
+                    var args = Array.prototype.splice.apply(arguments, [1]);
+                    for (var i = 0; i < this.handlers[eventName].length; i += 1) {
+                        var handler = this.handlers[eventName][i];
+                        handler.apply(this, args);
                     }
                 }
             }
         };
-        return function (items) {
-            var r = {};
-            for (var key in items) {
-                if (items.hasOwnProperty(key)) {
-                    r[key] = new Panel(key, items[key]);
-                }
+
+        var panels = {};
+        return function (panelName) {
+            if (panels[panelName] === undefined) {
+                panels[panelName] = new Panel(panelName);
             }
-            return r;
+            return panels[panelName];
         };
     });
 
-    app.controller('MainController', function ($scope, $panels) {
-        $scope.panels = $panels({
-            'eventlog': 'Event Log',
-            'subreddits': 'Manage Subscriptions'
-        });
-
-        $scope.changePanel = function (name) {
+    app.controller('MainController', function ($rootScope, $scope, $location, panels) {
+        $scope.panels = panels;
+        $scope.panel = null;
+        $scope.changePanel = function (panelName) {
             if ($scope.panel) {
-                $scope.panel.trigger('close');
+                $scope.panel.trigger('closing');
             }
-            $scope.panel = $scope.panels[name];
-            $scope.panel.trigger('open');
+            $scope.panel = panels(panelName);
+            if ($scope.panel) {
+                $scope.panel.trigger('opening');
+            }
         };
+        $rootScope.$on('$locationChangeSuccess', function () {
+            var path = $location.path();
+            if (path && typeof path == 'string' && path.charAt(0) === '/') {
+                var name = path.substr(1);
+                $scope.changePanel(name);
+            }
+        });
     });
 
-    app.controller('NotifyController', function ($scope, $notify) {
+    app.controller('NotifyController', function ($scope, notify) {
         $scope.message = null;
-        $scope.error = null;
-        $scope.success = null;
+        $scope.type = null;
 
-        $notify(function (type, msg) {
+        notify.register(function (type, msg) {
             $scope.message = msg;
-            $scope.alert = type == 'alert';
-            $scope.error = type == 'error';
-            $scope.success = type == 'success';
-            $scope.waiting = type == 'waiting';
+            $scope.type = type;
         });
-
-        $scope.close = function () {
-            $scope.error = null;
-            $scope.success = null;
-            $scope.message = null;
-        };
-    });
-
-    app.controller('SubscriptionsController', function ($scope, $notify, $ajax) {
-        $scope.panels.subreddits.opening(function () {
-            $scope.loading = true;
-            $scope.subscriptions = [];
-            $ajax.get('/adminPanel/api/subscriptions',
-                function (success, data, status, statusText) {
-                    $scope.loading = false;
-                    if (!success) { $notify.error('Error loading panel: ' + statusText); }
-                    else { $scope.subscriptions = data.result; }
-                });
-        });
-
-        $scope.autoDetect = {
-            busy: false,
-            go: function () {
-                $notify.waiting('Detecting subscriptions...');
-                $scope.autoDetect.busy = true;
-                $ajax.post('/adminPanel/api/moderatorOf',
-                    function (success, data, status, statusText) {
-                        if (!success) { $notify.error('Error detecting subscriptions:' + data.error); }
-                        console.log(data);
-                    });
-            }
-        };
     });
 })(angular.module('Admin', []));

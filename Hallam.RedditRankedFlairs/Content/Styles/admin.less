@@ -30,7 +30,7 @@ ul {
 }
 
 /*
-    Components
+    Page Elements
 */
 
 @header-height: 45px;
@@ -194,6 +194,10 @@ header {
     i.fa { padding-right: 2px; }
 }
 
+.button.sm {
+    padding: 2px 5px;
+}
+
 .button[disabled] {
     background-color: #999;
     border: 1px solid #ddd;
@@ -235,6 +239,54 @@ header {
         height: 0;
         visibility: hidden;
     }
+}
+
+.modal {
+    margin-top: 0;
+    top: 180px;
+    width: 460px;
+}
+
+.modal-content {
+    background-clip: padding-box;
+    background-color: white;
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 6px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.5);
+    outline: 0;
+    position: relative;
+}
+
+.modal-header {
+    background-color: #ededed;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 15px;
+    button.close {
+        background: 0 0;
+        border: 0;
+        color: black;
+        cursor: pointer;
+        font-size: 21px;
+        font-weight: 700;
+        float: right;
+        line-height: 1;
+        margin-top: -2px;
+        opacity: .2;
+        padding: 0;
+        text-shadow: 0 1px 0 white;
+        -webkit-appearance: none;
+    }
+}
+
+.modal-body {
+    position: relative;
+    padding: 15px;
+}
+
+.modal-footer {
+    border-top: 1px solid #e5e5e5;
+    padding: 15px;
+    text-align: right;
 }
 
 .notify {

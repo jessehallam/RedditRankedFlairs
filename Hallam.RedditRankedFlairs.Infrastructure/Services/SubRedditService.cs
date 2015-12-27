@@ -15,6 +15,12 @@ namespace Hallam.RedditRankedFlairs.Services
             _context = context;
         }
 
+        public async Task<bool> AddAsync(string name)
+        {
+            _context.SubReddits.Add(new SubReddit {Name = name});
+            return await _context.SaveChangesAsync() > 0;
+        } 
+
         public async Task<ICollection<SubReddit>> GetAllAsync()
         {
             return await _context.SubReddits.OrderBy(sub => sub.Name).ToListAsync();

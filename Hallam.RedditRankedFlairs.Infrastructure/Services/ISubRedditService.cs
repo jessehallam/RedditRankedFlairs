@@ -9,7 +9,9 @@ namespace Hallam.RedditRankedFlairs.Services
     /// </summary>
     public interface ISubRedditService
     {
-            /// <summary>
+        Task<bool> AddAsync(string name);
+
+        /// <summary>
         ///     Gets a collection of all subscribed sub reddits asynchronously.
         /// </summary>
         /// <returns>A collection of SubReddit objects.</returns>

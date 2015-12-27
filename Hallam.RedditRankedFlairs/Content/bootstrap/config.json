@@ -382,12 +382,7 @@
     "@hr-border": "@gray-lighter"
   },
   "css": [
-    "component-animations.less",
-    "dropdowns.less",
-    "tooltip.less",
-    "popovers.less",
-    "modals.less",
-    "carousel.less"
+    "tooltip.less"
   ],
   "js": [
     "alert.js",
@@ -403,5 +398,5 @@
     "scrollspy.js",
     "transition.js"
   ],
-  "customizerUrl": "http://getbootstrap.com/customize/?id=280254e0dc28755c806e"
+  "customizerUrl": "http://getbootstrap.com/customize/?id=5e340167564aa8f1f273"
 }
