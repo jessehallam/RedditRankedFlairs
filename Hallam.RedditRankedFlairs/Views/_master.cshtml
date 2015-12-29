@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+
+@{
+    string angularApp = "";
+    string angularController = "";
+
+    if (Page.Angular != null)
+    {
+        angularApp = $"ng-app=\"{Page.Angular}\"";
+        angularController = $"ng-controller=\"MainController\"";
+    }
+}
+@functions
+{
+
+    MvcHtmlString NoEscape(string s)
+    {
+        return new MvcHtmlString(s);
+    }
+
+}
+
+
+<html lang="en" @NoEscape(angularApp)>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>@(Page.Title ?? "Reddit Ranked Flairs")</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="~/Content/css/bootstrap.css">
+        <link rel="stylesheet" href="~/Content/css/site.less">
+
+        <script src="~/Content/js/jquery.min.js"></script>
+        @if (Page.Angular != null)
+        {
+            <script src="~/Content/js/angular.js"></script>
+        }
+
+        @RenderSection("head", false)
+    </head>
+    <body @NoEscape(angularController)>
+        <div class="container">
+            <div class="row">
+                <header>
+                    <div class="col-md-6">
+                        <h1>Ranked Reddit Flairs</h1>
+                    </div>
+                    <div class="col-md-6">
+                        <nav>
+                            <ul>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <li>
+                                        <a href="/profile">Profile</a>
+                                    </li>
+                                }
+                                <li>
+                                    <a href="/about">About</a>
+                                </li>
+                                @if (User.IsInRole("admin") || User.IsInRole("moderator"))
+                                {
+                                    <li>
+                                        <a href="/adminPanel">Admin</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                </header>
+            </div>
+
+            @RenderBody()
+        </div>
+    </body>
+</html>

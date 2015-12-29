@@ -1,92 +1,98 @@
 (function (app) {
-
-    app.factory('$summoners', function ($resource) {
-        return {};
-    });
-
-    app.factory('$messages', function () {
-        var listeners = [];
-        function addListener(listener) {
-            listeners.push(listener);
-        }
-        addListener.error = function (msg) {
-            for (var i = 0; i < listeners.length; i++)
-                listeners[i]('error', msg);
-        };
-        addListener.success = function (msg) {
-            for (var i = 0; i < listeners.length; i++)
-                listeners[i]('success', msg);
-        };
-        return addListener;
-    });
-
-    app.factory('$registration', function () {
+    app.factory('summoners', function (ajax) {
         return {
-            code: null
-        };
-    });
-
-    app.controller('MainController', function ($scope, $resource, $summoners) {
-        $scope.summoners = $summoners;
-    });
-
-    app.controller('NotificationController', function ($scope, $messages) {
-        $messages(function (type, msg) {
-            $scope.notification = { type: type, msg: msg };
-        });
-    });
-
-    app.controller('RegisterController', function ($scope, $http, $registration, $timeout) {
-        $scope.ok = function () {
-            var data = { region: $scope.region, summonerName: $scope.summonerName };
-            var request = $http.post('/profile/api/register', data).then(function (resp) { return resp.data; });
-            request.then(
-                function success(resp) {
-                    $registration.code = resp.result.code;
-                    $registration.data = data;
-                    $scope.busy = false;
-                    modal.close();
-                    $timeout(function () { modal('#validation-modal'); }, 300);
-                },
-                function error(resp) {
-                    if (resp.status == 400) {
-                        $scope.status = { error: resp.validationErrors[0] };
-                    }
-                    else {
-                        $scope.status = { error: resp.error };
-                    }
-                    $scope.busy = false;
+            items: [],
+            update: function () {
+                var $this = this;
+                $this.loading = true;
+                ajax.get('/profile/api/summoners', function (success, data) {
+                    $this.loading = null;
+                    $this.items = data.result;
                 });
-            $scope.busy = true;
-            $scope.status = null;
+            }
         };
     });
 
-    app.controller('ValidationController', function ($scope, $http, $registration, $timeout) {
-        $scope.registration = $registration;
-        $scope.ok = function () {
-            $scope.busy = true;
-            $scope.status = { msg: 'This may take a minute. Please be patient.' };
-            $timeout(function () {
-                var request = $http.post('/profile/api/validate', $registration.data);
-                request = request.then(function (r) { return r.data; });
-                request.then(
-                    function success(resp) {
-                        window.location.reload(true);
-                    },
-                    function error(resp) {
-                        if (resp.status == 417) {
-                            $scope.status = { msg: 'Validation was unsuccessful.' };
+    app.controller('MainController', function ($scope, summoners) {
+        $scope.summoners = summoners;
+        summoners.update();
+    });
+
+    app.controller('NotifyController', function ($scope) {
+
+    });
+
+    app.controller('RegisterController', function ($scope, $timeout, ajax, modal) {
+        var dialog = modal('#register-modal');
+        $scope.busy = false;
+
+        dialog.register('closing', function () {
+            $scope.code = undefined;
+            $scope.status = undefined;
+        });
+
+        function getValidationCode() {
+            var data = {
+                summonerName: $scope.summonerName,
+                region: $scope.region
+            };
+            ajax.post('/profile/api/register', data,
+                function (success, data) {
+                    $scope.busy = false;
+                    if (!success) {
+                        $scope.status = { error: true, message: data.error };
+                        return;
+                    }
+                    $scope.code = data.result.code;
+                });
+        }
+
+        function checkValidationStatus(attempts) {
+            var data = {
+                summonerName: $scope.summonerName,
+                region: $scope.region
+            };
+            ajax.post('/profile/api/validate', data,
+                function (success, data, status) {
+                    if (!success) {
+                        if (--attempts >= 0) {
+                            $timeout(function () { checkValidationStatus(attempts); }, 10000);
                         }
-                        else if (resp.status == 400) {
-                            $scope.status = { error: resp.validationErrors[0] };
+                        if (status == 417) {
+                            $scope.status = { message: 'Unable to validate summoner.' };
+                            $timeout(function () { $scope.busy = false; }, 1000);
                         }
                         else {
-                            $scope.status = { error: resp.error };
+                            $scope.status = { error: true, message: data.error };
                         }
-                        $scope.busy = false;
-                    });
-            }, 10000);
+                    }
+                    else {
+                        $scope.status = undefined;
+                        $scope.code = undefined;
+                        $scope.summoner = undefined;
+                        $scope.region = undefined;
+                        dialog.hide();
+                        $scope.summoners.update();
+                    }
+                });
+        }
+
+        function validateSummoner() {
+            $scope.status = { message: 'This could take a minute...' };
+            checkValidationStatus(1);
+        }
+
+        $scope.close = function () { dialog.hide(); };
+        $scope.confirm = function () {
+            $scope.busy = true;
+
+            if ($scope.code) {
+                validateSummoner();
+            }
+            else {
+                getValidationCode();
+            }
         };
     });
-})(angular.module('Profile', ['ngResource']));
+    app.controller('ValidationController', function () { });
+})(angular.module('Profile'));

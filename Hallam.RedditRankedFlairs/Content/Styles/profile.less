@@ -1,7 +1,21 @@
 ﻿@import "vars.less";
 
+.notify {
+    transform: scaleY(1);
+    transform-origin: top;
+    transition: transform .25s ease-in;
+}
+
+.notify-hidden {
+    transform: scaleY(0);
+}
+
 .controls {
     margin-bottom: 20px;
+}
+
+tbody tr {
+    cursor: pointer;
 }
 
 tfoot td {
@@ -12,15 +26,74 @@ tfoot td {
     text-shadow: 0 0 1px rgba(255,0,0,.25);
 }
 
+.row {
+    margin-top: 10px;
+}
+
 .modal {
-    background-color: rgba(0, 0, 0, 0.88);
+    background-color: rgba(0,0,0,0.88);
     max-width: 440px;
     padding: 25px;
 
-    p {
-        font-size: 13px;
+    button.close {
+        -webkit-appearance: none;
+        padding: 0;
+        cursor: pointer;
+        color: white;
+        background: 0 0;
+        border: 0;
+        float: right;
+        font-size: 21px;
+        font-weight: 700;
+        line-height: 1;
+        text-shadow: 0 1px 0 white;
+    }
+}
+
+.modal-content {
+    position: absolute;
+}
+
+.modal-header {
+    h3 {
+        font-size: 28px;
+        font-weight: normal;
+        line-height: 1;
         margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+    p {
+        
+    }
+}
+
+.modal-body {
+    height: 186px;
+    overflow-x: hidden;
+    padding: 10px 0;
+    white-space: nowrap;
+    width: 440px;
+
+    blockquote {
+        font-size: 2em;
+        padding-top: 30px;
+        text-align: center;
+    }
+
+    em {
+        color: @button-background-color;
+        font-style: normal;
+        font-weight: 600;
+    }
+
+    p {
+        font-size: 14px;
+        margin-bottom: 0;
         white-space: normal;
+    }
+
+    strong {
+        font-size: 1.2em;
     }
 
     input[type="text"] {
@@ -29,9 +102,9 @@ tfoot td {
         box-sizing: border-box;
         color: black;
         display: block;
-        font-size: 16px;
+        font-size: 14px;
         margin-bottom: 10px;
-        padding: 8px;
+        padding: 6px;
         width: 100%;
     }
 
@@ -41,116 +114,33 @@ tfoot td {
         box-sizing: border-box;
         color: black;
         display: block;
-        font-size: 16px;
+        font-size: 14px;
         margin-bottom: 10px;
-        padding: 7px;
+        padding: 5px;
         width: 100%;
     }
+}
 
-    button {
-        display: block;
-        font-size: 16px;
-        text-transform: uppercase;
-        width: 100%;
+.modal-stage {
+    display: inline-block;
+    height: 186px;
+    width: 440px;
+    vertical-align: top;
+    &.slide-left {
+        margin-left: -440px;
+        transition: margin-left .222s linear;
     }
+}
 
-    .modal-content {
-        overflow: hidden;
-        white-space: nowrap;
-    }
-
+.modal-foot {
+    text-align: right;
     .status {
-        margin-bottom: 10px;
-    }
-
-    h3 {
-        font-size: 28px;
-        font-weight: normal;
-        line-height: 1;
-        margin-bottom: 10px;
-        text-transform: uppercase;
-    }
-
-    em {
-        color: @button-background-color;
-        font-style: normal;
-        font-weight: bold;
-    }
-
-    blockquote {
-        color: @button-background-color;
-        font-family: monospace;
-        font-size: 21px;
-        letter-spacing: .08em;
-        margin-bottom: 15px;
-        text-align: center;
-    }
-}
-
-/*
-#register-modal {
-    max-width: 440px;
-
-
-    
-
-    .register-step {
         display: inline-block;
-        overflow: hidden;
-        min-height: 169px;
-        width: 380px;
+        height: 32px;
+        line-height: 32px;
+        padding-right: 5px;
     }
-
-    .register-step.collapsed {
-        transition: width 0.3s ease;
-        width: 0px;
-    }
-
-    
-
-    p {
-        font-size: 12px;
-        margin-bottom: 10px;
-        white-space: normal;
-    }
-    strong {
-        display: block;
-        font-size: 18px;
-        padding-bottom: 10px;
-    }
-    em {
-        color: @button-background-color;
-        font-size: 16px;
-        font-style: normal;
-        font-weight: bold;
-    }
-    
-}*/
-
-#subscribe-dialog {
-    ul {
-        min-height: 62px;
-        li {
-            margin-left: 15px;
-        }
-        
-        a {
-            display: block;
-            height: 21px;
-            line-height: 21px;
-        }
-    }
-}
-
-#delete-summoner-dialog {
-    p {
-        margin: 15px 0 25px 0;
-    }
-    strong {
-        color: @button-background-color;
-        font-size: 16px;
-    }
-    button + button {
-        margin-left: 5px;
+    .status.error {
+        color: red;
     }
 }

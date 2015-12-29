@@ -18,6 +18,11 @@ namespace Hallam.RedditRankedFlairs.Controllers
             _users = users;
         }
 
+        public ActionResult About()
+        {
+            return View();
+        }
+
         public ActionResult Index()
         {
             if (User.Identity.IsAuthenticated)

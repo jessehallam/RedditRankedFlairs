@@ -1,85 +1,19 @@
-﻿@model Hallam.RedditRankedFlairs.Models.ProfileViewModel
-@{
-    Layout = "~/Views/_layout.cshtml";
+﻿@{
+    Layout = "~/Views/_master.cshtml";
     Page.Title = "Profile";
-    Page.AngularApp = "Profile";
+    Page.Angular = "Profile";
 }
+
 @section head {
-    <link rel="stylesheet" href="~/Content/Styles/profile.less">
-    <link rel="stylesheet" href="~/Content/Styles/modal.less">
-    <script src="~/Content/js/modal.js"></script>
-    <script src="~/Content/js/profile.js"></script>
+    <link rel="stylesheet" href="~/Content/css/profile.less">
+    <script>window.app = angular.module('Profile', []);</script>
+    <script src="~/Content/js/bootstrap.min.js"></script>
+    <script src="~/Content/js/angular-services.js"></script>
+    <script src="~/Content/js/profile2.js"></script>
 }
 
-<h2>Profile for /u/@User.Identity.Name</h2>
-
-<div class="notify" ng-controller="NotificationController" ng-show="notification.type"
-     ng-class="{'error': 'notify-error', 'success': 'notify-success'}[notification.type]">
-    {{notification.msg}}
+<div class="row text-center">
+    <h2>Profile for /u/@User.Identity.Name</h2>
 </div>
 
-<div style="margin-bottom: 10px">
-    <button type="button" onclick="modal('#register-modal')">
-        <i class="fa fa-bars"></i> Register Summoner
-    </button>
-</div>
-
-@Html.Partial("_register")
-
-@if (Model.User.Summoners.Any(s => !s.LeagueInfo.UpdatedTime.HasValue))
-{
-    <div class="notify notify-info">
-        <strong>Flair is updating.</strong> A summoner's flair is being updated. This typically takes a few minutes, 
-        but can take longer from time to time.
-    </div>
-}
-
-<table class="table">
-    <thead>
-        <tr>
-            <th style="width: 6%">&nbsp;</th>
-            <th style="width: 18%">Region</th>
-            <th style="width: 24%">Summoner Name</th>
-            <th style="width: 24%">League</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var summoner in Model.User.Summoners)
-        {
-            <tr>
-                <td>
-                    @*
-                    @if (Model.User.ActiveSummoner?.Id != summoner.Id)
-                    {
-                        <a href="/profile/summoner/@summoner.Region/@summoner.SummonerId/activate" title="Activate Summoner">
-                            <i class="fa fa-star"></i>
-                        </a>
-                    }
-
-                    <a href="/profile/summoner/@summoner.Region/@summoner.SummonerId/delete" title="Unlink Summoner">
-                        <i class="fa fa-trash"></i>
-                    </a>*@
-                </td>
-                <td>@summoner.Region.ToUpperInvariant()</td>
-                <td>@summoner.Name</td>
-                <td>
-                    @{
-                        var s = @LeagueUtil.Stringify(summoner.LeagueInfo);
-                        Write(!string.IsNullOrEmpty(s) ? s : "Updating...");
-                    }
-
-                </td>
-                <td>
-                    @if (summoner.Id == Model.User.ActiveSummoner?.Id)
-                    {
-                        <span class="label label-primary">Active</span>
-                    }
-                    <span class="label label-success">Verified</span>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<div class="modal-overlay"></div>
+@{ Html.RenderPartial("_summoners"); }

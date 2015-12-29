@@ -1,42 +1,41 @@
 ﻿@using Hallam.RedditRankedFlairs.Models
+
 <div id="register-modal" class="modal modal-fade-in" ng-controller="RegisterController">
     <div class="modal-content">
-        <h3>Register Summoner</h3>
-        <p>
-            Use this dialog to link your summoner to your Reddit account. Linking your summoner will allow you to
-            display ranked flairs on some qualifying sub-Reddits.
-        </p>
-        <form>
-            <input type="text" name="summonerName" id="summonerName" placeholder="Summoner Name" ng-model="summonerName">
-            <select name="region" id="region" ng-model="region">
-                @foreach (var region in SummonerModel.AllRegions)
-                {
-                    <option value="@region">@region</option>
-                }
-            </select>
-            <div class="status">
-                <span ng-show="status" ng-class="{'error': status.error}">{{status.error || status.msg}}</span>
-            </div>
-            <button type="submit" ng-disabled="!summonerName || !region || busy" ng-click="ok()">
-                <i class="fa fa-spin fa-spinner" ng-show="busy"></i> {{ busy ? 'Please wait...' : 'Confirm' }}
-            </button>
-        </form>
-    </div>
-</div>
-
-<div id="validation-modal" class="modal modal-fade-in" ng-controller="ValidationController">
-    <div class="modal-content">
-        <h3>Validate Summoner</h3>
-        <p>
-            <em>Almost done!</em> Validate your summoner by changing one of your <em>rune pages</em> to the
-            following code:
-        </p>
-        <blockquote>{{registration.code}}</blockquote>
-        <div class="status">
-            <span ng-show="status" ng-class="{'error': status.error}">{{status.error || status.msg}}</span>
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="close()">&times;</button>
+            <h3>Register Summoner</h3>
         </div>
-        <button type="button" ng-disabled="busy" ng-click="ok()">
-            <i class="fa fa-spin fa-spinner" ng-show="busy"></i> {{ busy ? 'Please wait...' : 'Confirm' }}
-        </button>
+        <div class="modal-body">
+            <div class="modal-stage" ng-class="{'slide-left': code}">
+                <p>This dialog will allow you to link your summoner to your Reddit account.</p>
+                <p>Linking your summoner will allow you to display flairs on qualifying sub reddits.</p>
+                <form>
+                    <input type="text" placeholder="Summoner name" ng-model="summonerName" ng-disabled="busy">
+                    <select ng-model="region" ng-disabled="busy">
+                        @foreach (string r in SummonerModel.AllRegions)
+                        {
+                            <option value="@r">@r</option>}
+                    </select>
+                </form>
+            </div>
+            <div class="modal-stage">
+                <p>
+                    <strong>Almost done!</strong>
+                </p>
+                <p>
+                    Validate your summoner by changing a <em>rune page</em> to the code:
+                </p>
+                <blockquote>
+                    {{code}}
+                </blockquote>
+            </div>
+        </div>
+        <div class="modal-foot">
+            <span class="status" ng-class="{'status-error': status.error}">{{status.message}}</span>
+            <button type="submit" ng-disabled="busy || !(summonerName && region)" ng-click="confirm()">
+                <i class="fa" ng-class="{true: 'fa-spin fa-spinner', false: 'fa-check'}[busy]"></i> {{busy ? 'Please wait...' : 'Continue'}}
+            </button>
+        </div>
     </div>
 </div>

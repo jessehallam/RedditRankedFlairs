@@ -1,0 +1,135 @@
+﻿@using Hallam.RedditRankedFlairs.Models
+<div class="row">
+    <button type="button" class="btn btn-primary" ng-click="registerSummoner()">
+        <i class="fa fa-bars"></i> Link Summoner
+    </button>
+</div>
+
+<div class="row">
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width: 50px">&nbsp;</th>
+                <th style="width: 100px">Region</th>
+                <th style="width: 192px">Summoner Name</th>
+                <th style="width: 121px">League</th>
+                <th style="width: 148px">Flair Updated</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="summoner in summoners.items">
+                <td>
+                    <div class="btn-group">
+                        <a href="#" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            &hellip; <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" ng-show="!summoner.active">Activate</a></li>
+                            <li><a href="#" ng-click="deleteSummoner(summoner)">Delete</a></li>
+                        </ul>
+                    </div>
+                </td>
+                <td>{{summoner.region}}</td>
+                <td>{{summoner.summonerName}}</td>
+                <td>
+                    {{summoner.league}}
+                    <span class="hint" ng-show="summoner.league == ''" ng-tooltip="right,This summoner will update shortly.">Updating...</span>
+                </td>
+                <td>{{summoner.flairUpdated}}</td>
+                <td>
+                    <span class="label label-primary" ng-show="summoner.active">Active</span>
+                    <span class="label label-success">Verified</span>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr ng-show="summoners.items.length == 0">
+                <td colspan="5">No summoners linked.</td>
+            </tr>
+            <tr ng-show="summoners.loading">
+                <td colspan="5">Loading summoners...</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="modal" id="modal-confirm-delete" ng-controller="DeleteController">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-disabled="busy">&times;</button>
+                <h4 class="modal-title">Confirm Delete</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Really delete <strong>{{dialog.data.summonerName}} ({{dialog.data.region}})</strong>?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="busy">Cancel</button>
+                <button type="button" class="btn btn-primary" ng-click="confirm()" ng-disabled="busy">
+                    <i class="fa fa-spin fa-spinner" ng-show="busy"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modal-register" ng-controller="RegisterController">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-disabled="busy">&times;</button>
+                <h4 class="modal-title">Register Summoner</h4>
+            </div>
+            <div class="modal-body">
+                <div class="modal-wizard">
+                    <div class="modal-wizard-step" ng-class="{'slide-left': code}">
+                        <p>This dialog will allow you to link your summoner to your Reddit account.</p>
+                        <p>Linking your summoner will allow you to display a ranked flair on qualifying sub-Reddits.</p>
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="summonerName" class="col-sm-4 control-label">Summoner Name</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="summonerName" ng-disabled="busy" ng-model="summonerName">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="region" class="col-sm-4 control-label">Region</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="region" ng-disabled="busy" ng-model="region">
+                                        @foreach (string r in SummonerModel.AllRegions)
+                                        {
+                                            <option value="@r">@r</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-wizard-step">
+                        <p>
+                            <strong>Almost Done!</strong>
+                        </p>
+                        <p>
+                            Validate your summoner by changing a <em>rune page</em> to:
+                        </p>
+                        <blockquote>{{code}}</blockquote>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="alert alert-dismissible alert-danger" ng-show="alert">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <span>{{alert.text}}</span>
+                </div>
+                <button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="busy">Cancel</button>
+                <button type="button" class="btn btn-primary" ng-click="confirm()" ng-disabled="busy || !(summonerName && region)">
+                    <i class="fa fa-spin fa-spinner" ng-show="busy"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

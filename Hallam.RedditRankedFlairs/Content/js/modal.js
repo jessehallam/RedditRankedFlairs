@@ -7,5 +7,5 @@ modal.close = function () {
 };
 
 $(function () {
-    $('.modal-overlay').click(function () { $('.modal-show').removeClass('modal-show'); });
+    // $('.modal-overlay').click(function () { $('.modal-show').removeClass('modal-show'); });
 });
