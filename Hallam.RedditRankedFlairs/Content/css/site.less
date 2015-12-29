@@ -117,3 +117,32 @@ h2 {
     font-weight: 200;
     margin-bottom: 40px;
 }
+
+.transform(@first) {
+    -webkit-transform: @first;
+    -moz-transform: @first;
+    -ms-transform: @first;
+    transform: @first;
+}
+
+.transform(@first, @second) {
+    -webkit-transform: @first @second;
+    -moz-transform: @first @second;
+    -ms-transform: @first;
+    transform: @first @second;
+}
+
+.transition(@rule) {
+    -webkit-transition: @rule;
+    -moz-transform: @rule;
+    transform: @rule;
+}
+
+.modal.pop-in {
+    .transform(scale(0.7));
+    .transition(all .3s);
+}
+
+.modal.pop-in.in {
+    .transform(scale(1));
+}

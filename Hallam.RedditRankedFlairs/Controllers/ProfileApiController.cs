@@ -20,6 +20,29 @@ namespace Hallam.RedditRankedFlairs.Controllers
             Summoners = summoners;
         }
 
+        [HttpPost, Route("profile/api/activate")]
+        public async Task<IHttpActionResult> ActivateSummoner(SummonerModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var user = await Users.GetUserAsync();
+            var summoner = user.Summoners.FirstOrDefault(DbUtil.CreateComparer(model.Region, model.SummonerName));
+
+            if (summoner == null)
+            {
+                return Conflict("Summoner not found.");
+            }
+
+            if (!await Summoners.SetActiveSummonerAsync(summoner))
+            {
+                return Conflict("Unable to activate summoner.");
+            }
+
+            return Ok();
+        }
+
         [HttpPost, Route("profile/api/delete")]
         public async Task<IHttpActionResult> DeleteSummoner(SummonerModel model)
         {

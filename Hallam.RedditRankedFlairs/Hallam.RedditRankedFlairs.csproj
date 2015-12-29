@@ -180,18 +180,12 @@
     <Content Include="Content\bootstrap\css\bootstrap.min.css" />
     <Content Include="Content\bootstrap\js\bootstrap.js" />
     <Content Include="Content\bootstrap\js\bootstrap.min.js" />
-    <Content Include="Content\js\admin.js" />
-    <Content Include="Content\js\admin\subscriptions.js" />
-    <Content Include="Content\js\angular-resource.js" />
-    <Content Include="Content\js\angular-resource.min.js" />
     <Content Include="Content\js\angular-services.js" />
     <Content Include="Content\js\angular.js" />
     <Content Include="Content\js\angular.min.js" />
     <Content Include="Content\js\bootstrap.min.js" />
     <Content Include="Content\js\jquery.min.js" />
-    <Content Include="Content\js\modal.js" />
     <Content Include="Content\js\profile.js" />
-    <Content Include="Content\js\profile2.js" />
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -226,20 +220,13 @@
   <ItemGroup>
     <Content Include="Views\web.config" />
     <Content Include="packages.config" />
-    <Content Include="Content\Styles\modal.less" />
-    <Content Include="Content\Styles\normalize.less" />
-    <Content Include="Content\Styles\profile.less" />
-    <Content Include="Content\Styles\site.less" />
-    <Content Include="Content\Styles\vars.less" />
     <Content Include="Views\Login\index.cshtml" />
     <Content Include="Views\Profile\index.cshtml" />
     <Content Include="Views\_layout.cshtml" />
     <Content Include="Views\Profile\_register.cshtml" />
-    <Content Include="Content\js\angular-resource.min.js.map" />
     <Content Include="Areas\AdminPanel\Views\web.config" />
     <Content Include="Areas\AdminPanel\Views\AdminDefault\index.cshtml" />
     <Content Include="Areas\AdminPanel\Views\AdminDefault\_subreddits.cshtml" />
-    <Content Include="Content\Styles\admin.less" />
     <Content Include="Areas\AdminPanel\Views\AdminDefault\_subscriptions.cshtml" />
     <Content Include="Areas\AdminPanel\Views\AdminDefault\_eventlog.cshtml" />
     <Content Include="Content\bootstrap\config.json" />
@@ -262,6 +249,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Areas\AdminPanel\Models\" />
     <Folder Include="Areas\AdminPanel\Views\Shared\" />
+    <Folder Include="Content\js\admin\" />
     <Folder Include="Views\ProfileSummoner\" />
   </ItemGroup>
   <ItemGroup>
