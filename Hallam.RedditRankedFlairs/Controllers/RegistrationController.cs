@@ -110,7 +110,9 @@ namespace Hallam.RedditRankedFlairs.Controllers
                     await Summoners.SetActiveSummonerAsync(currentSummoner);
 
                 // Queue up the league update.
-                BackgroundJob.Enqueue<LeagueUpdateJob>(job => job.Execute(currentSummoner.Id));
+                var jobId = BackgroundJob.Enqueue<LeagueUpdateJob>(job => job.Execute(currentSummoner.Id));
+                // Queue up flair update.
+                BackgroundJob.ContinueWith<FlairUpdateJob>(jobId, job => job.Execute(user.Id));
                 return Ok();
             }
             catch (RiotHttpException e)

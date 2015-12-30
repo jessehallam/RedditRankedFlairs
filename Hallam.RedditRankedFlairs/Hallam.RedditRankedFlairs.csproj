@@ -187,7 +187,9 @@
     <Content Include="Content\js\jquery.min.js" />
     <Content Include="Content\js\profile.js" />
     <Content Include="Global.asax" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\AutofacConfig.cs" />
@@ -222,8 +224,6 @@
     <Content Include="packages.config" />
     <Content Include="Views\Login\index.cshtml" />
     <Content Include="Views\Profile\index.cshtml" />
-    <Content Include="Views\_layout.cshtml" />
-    <Content Include="Views\Profile\_register.cshtml" />
     <Content Include="Areas\AdminPanel\Views\web.config" />
     <Content Include="Areas\AdminPanel\Views\AdminDefault\index.cshtml" />
     <Content Include="Areas\AdminPanel\Views\AdminDefault\_subreddits.cshtml" />

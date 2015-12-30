@@ -44,6 +44,7 @@ namespace Hallam.RedditRankedFlairs
             builder.RegisterType(typeof (SummonerService)).As(typeof (ISummonerService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (SubRedditService)).As(typeof (ISubRedditService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (RedditService)).As(typeof (IRedditService)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof (FlairService)).As(typeof (IFlairService)).InstancePerLifetimeScope();
             builder.Register(context => new RiotService
             {
                 WebRequester = new RiotWebRequester
@@ -67,6 +68,8 @@ namespace Hallam.RedditRankedFlairs
 
             // Jobs
             builder.RegisterType(typeof (LeagueUpdateJob)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof (BulkFlairUpdateJob)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof (FlairUpdateJob)).InstancePerLifetimeScope();
 
             // Data persistance
             builder.RegisterType(typeof (UnitOfWork)).As(typeof (IUnitOfWork)).InstancePerLifetimeScope();

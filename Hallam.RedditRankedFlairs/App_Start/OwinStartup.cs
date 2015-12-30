@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Security.Claims;
 using System.Web.Http;
 using Hallam.RedditRankedFlairs;
+using Hallam.RedditRankedFlairs.Jobs;
 using Hallam.RedditRankedFlairs.Security;
 using Hangfire;
 using Microsoft.AspNet.Identity;
@@ -18,6 +19,8 @@ namespace Hallam.RedditRankedFlairs
 {
     public static class OwinStartup
     {
+        private const string FlairJobId = "$FlairJob";
+
         public static void Configuration(IAppBuilder app)
         {
             // Enable the application to use a cookie to store information for the signed in user.
@@ -40,6 +43,8 @@ namespace Hallam.RedditRankedFlairs
                 AuthorizationFilters = new[] {new HangfireDashboardAuthorizationFilter(),}
             });
             app.UseHangfireServer();
+
+            RecurringJob.AddOrUpdate<BulkFlairUpdateJob>(FlairJobId, job => job.Execute(), Cron.Minutely);
         }
 
         private static RedditAuthenticationOptions GetRedditOptions()
