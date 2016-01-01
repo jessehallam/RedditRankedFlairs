@@ -20,6 +20,7 @@ namespace Hallam.RedditRankedFlairs
     public static class OwinStartup
     {
         private const string FlairJobId = "$FlairJob";
+        private const string LeagueJobId = "$LeagueJob";
 
         public static void Configuration(IAppBuilder app)
         {
@@ -45,6 +46,7 @@ namespace Hallam.RedditRankedFlairs
             app.UseHangfireServer();
 
             RecurringJob.AddOrUpdate<BulkFlairUpdateJob>(FlairJobId, job => job.Execute(), Cron.Minutely);
+            RecurringJob.AddOrUpdate<BulkLeagueUpdateJob>(LeagueJobId, job => job.Execute(), Cron.Minutely);
         }
 
         private static RedditAuthenticationOptions GetRedditOptions()

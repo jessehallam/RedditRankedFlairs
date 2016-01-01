@@ -19,14 +19,14 @@ namespace Hallam.RedditRankedFlairs.Services
 
         public async Task<ICollection<User>> GetUsersForUpdateAsync(int max)
         {
-            var users = _context.Users;
-            var results = from user in users
-                          where user.FlairUpdateRequiredTime.HasValue
-                          orderby user.FlairUpdateRequiredTime ascending
-                          select user;
+            var results = new List<User>();
+            var query = from user in _context.Users
+                        where user.FlairUpdateRequiredTime.HasValue
+                              || !user.FlairUpdatedTime.HasValue
+                        orderby user.FlairUpdateRequiredTime
+                        select user;
 
-            var result = await results.Take(max).ToListAsync();
-            return result;
+            return await query.Take(max).ToListAsync();
         }
 
         public async Task<bool> SetUpdateFlagAsync(IEnumerable<User> users, bool requiresUpdate = true)
@@ -46,6 +46,6 @@ namespace Hallam.RedditRankedFlairs.Services
                 user.FlairUpdatedTime = DateTimeOffset.Now;
             }
             return await _context.SaveChangesAsync() > 0;
-        } 
+        }
     }
 }
