@@ -86,6 +86,18 @@ namespace Hallam.RedditRankedFlairs
                     writer.WriteLine();
                 }
 
+                var context = HttpContext.Current;
+
+                writer.WriteLine("HTTP Context -------------");
+                writer.WriteLine("HTTP Method: " + context.Request.HttpMethod);
+                writer.WriteLine("Url: " + context.Request.Url);
+                writer.WriteLine("Is Authenticated: " + context.User.Identity.IsAuthenticated);
+                if (context.User.Identity.IsAuthenticated)
+                {
+                    writer.WriteLine("User: " + context.User.Identity.Name);
+                }
+                writer.WriteLine("--------------------------");
+
                 writer.WriteLine(error.ToString());
                 writer.Flush();
 
