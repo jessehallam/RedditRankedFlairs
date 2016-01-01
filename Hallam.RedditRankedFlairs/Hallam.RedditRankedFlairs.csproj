@@ -239,6 +239,7 @@
     <Content Include="Views\Login\about.cshtml" />
     <Content Include="Content\css\about.less" />
     <None Include="Properties\PublishProfiles\Grass.pubxml" />
+    <None Include="Properties\PublishProfiles\RedditRankedFlairs.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
