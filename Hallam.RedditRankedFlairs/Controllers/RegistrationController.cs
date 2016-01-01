@@ -106,7 +106,7 @@ namespace Hallam.RedditRankedFlairs.Controllers
                     await Summoners.AddSummonerAsync(user, riotSummoner.Id, model.Region, riotSummoner.Name);
 
                 // If the user doesn't have an active summoner, assign the new summoner as active.
-                if (user.ActiveSummoner == null)
+                if (await Summoners.GetActiveSummonerAsync(user) == null)
                     await Summoners.SetActiveSummonerAsync(currentSummoner);
 
                 // Queue up the league update.

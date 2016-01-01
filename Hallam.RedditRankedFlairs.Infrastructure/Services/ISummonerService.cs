@@ -34,6 +34,13 @@ namespace Hallam.RedditRankedFlairs.Services
         Task<Summoner> FindAsync(string region, string summonerName);
 
         /// <summary>
+        ///     Gets the summoner which is active for a user.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <returns>A summoner object.</returns>
+        Task<Summoner> GetActiveSummonerAsync(User user);
+
+            /// <summary>
         ///     Determines if a summoner is registered asynchronously.
         /// </summary>
         /// <param name="region">The summoner region.</param>

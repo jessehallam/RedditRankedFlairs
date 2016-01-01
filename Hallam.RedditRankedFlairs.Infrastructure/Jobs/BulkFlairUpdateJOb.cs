@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,13 +19,15 @@ namespace Hallam.RedditRankedFlairs.Jobs
         private readonly IUserService _users;
         private readonly IRedditService _reddit;
         private readonly ISubRedditService _subReddits;
+        private readonly ISummonerService _summoners;
 
-        public BulkFlairUpdateJob(IUserService users, IFlairService flairs, IRedditService reddit, ISubRedditService subReddits)
+        public BulkFlairUpdateJob(IUserService users, IFlairService flairs, IRedditService reddit, ISubRedditService subReddits, ISummonerService summoners)
         {
             _flairs = flairs;
             _users = users;
             _reddit = reddit;
             _subReddits = subReddits;
+            _summoners = summoners;
         }
 
         public void Execute()
@@ -56,12 +59,16 @@ namespace Hallam.RedditRankedFlairs.Jobs
                     continue;
                 }
 
-                var flairParams = (from u in users
-                                   select new UserFlairParameter
-                                   {
-                                       Name = u.Name,
-                                       Text = GetFlairText(u)
-                                   }).ToList();
+                var flairParams = new List<UserFlairParameter>();
+
+                foreach (var user in users)
+                {
+                    flairParams.Add(new UserFlairParameter
+                    {
+                        Name = user.Name,
+                        Text = await GetFlairTextAsync(user)
+                    });
+                }
 
                 foreach (var sub in subReddits)
                 {
@@ -80,9 +87,9 @@ namespace Hallam.RedditRankedFlairs.Jobs
             }
         }
 
-        private static string GetFlairText(User user)
+        private async Task<string> GetFlairTextAsync(User user)
         {
-            var summoner = user.ActiveSummoner;
+            var summoner = await _summoners.GetActiveSummonerAsync(user);
             return summoner == null ? "" : LeagueUtil.Stringify(summoner.LeagueInfo);
         }
     }

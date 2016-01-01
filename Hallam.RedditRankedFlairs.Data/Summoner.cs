@@ -11,6 +11,8 @@ namespace Hallam.RedditRankedFlairs.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        public bool IsActive { get; set; }
+
         public virtual LeagueInfo LeagueInfo { get; set; }
 
         [Index("IX_RegionSummonerName", 1, IsUnique = true), Required, StringLength(21)]
@@ -21,6 +23,10 @@ namespace Hallam.RedditRankedFlairs.Data
         
         public int SummonerId { get; set; }
 
+        [ForeignKey("User")]
+        public int UserId { get; set; }
+
+        [Required]
         public virtual User User { get; set; }
     }
 }

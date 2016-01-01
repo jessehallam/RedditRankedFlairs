@@ -22,9 +22,7 @@ namespace Hallam.RedditRankedFlairs.Data
 
         [Index(IsUnique = true), Required, StringLength(21)]
         public string Name { get; set; }
-
-        public virtual Summoner ActiveSummoner { get; set; }
-
+        
         public virtual ICollection<Summoner> Summoners { get; set; } 
     }
 }

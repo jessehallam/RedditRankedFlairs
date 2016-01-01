@@ -11,6 +11,7 @@ namespace Hallam.RedditRankedFlairs
 
         public static string Stringify(LeagueInfo league)
         {
+            if (league == null) return "";
             if (league.UpdatedTime.HasValue == false) return "";
             return league.Tier.ToString() + " " + DivisionNames[league.Division - 1];
         } 

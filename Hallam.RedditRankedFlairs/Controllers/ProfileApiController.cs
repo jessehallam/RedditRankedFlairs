@@ -84,8 +84,8 @@ namespace Hallam.RedditRankedFlairs.Controllers
             {
                 region = summoner.Region.ToUpperInvariant(),
                 summonerName = summoner.Name,
-                league = "",
-                active = summoner.Id == user.ActiveSummoner.Id
+                league = LeagueUtil.Stringify(summoner.LeagueInfo),
+                active = summoner.IsActive
             });
         }
 

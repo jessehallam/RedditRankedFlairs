@@ -42,6 +42,11 @@ namespace Hallam.RedditRankedFlairs.Services
                 summoner.Name == summonerName);
         }
 
+        public Task<Summoner> GetActiveSummonerAsync(User user)
+        {
+            return Task.Run(() => user.Summoners.FirstOrDefault(x => x.IsActive));
+        } 
+
         public Task<bool> IsSummonerRegistered(string region, string summonerName)
         {
             return UnitOfWork.Summoners.AnyAsync(summoner =>
@@ -53,11 +58,14 @@ namespace Hallam.RedditRankedFlairs.Services
         {
             var entity = await FindAsync(region, summonerName);
             if (entity == null) return false;
-            if (entity.User.ActiveSummoner.Id == entity.Id)
+            if (entity.IsActive)
             {
-                entity.User.ActiveSummoner = entity.User.Summoners.Count == 1
-                    ? null
-                    : entity.User.Summoners.First(s => s.Id != entity.Id);
+                // pass the active flag to another summoner if one exists.
+                var summoner = entity.User.Summoners.FirstOrDefault(x => x.Id != entity.Id);
+                if (summoner != null)
+                {
+                    summoner.IsActive = true;
+                }
             }
             UnitOfWork.Leagues.Remove(entity.LeagueInfo);
             UnitOfWork.Summoners.Remove(entity);
@@ -66,7 +74,11 @@ namespace Hallam.RedditRankedFlairs.Services
 
         public async Task<bool> SetActiveSummonerAsync(Summoner summoner)
         {
-            summoner.User.ActiveSummoner = summoner;
+            foreach (var s in summoner.User.Summoners)
+            {
+                s.IsActive = false;
+            }
+            summoner.IsActive = true;
             return await UnitOfWork.SaveChangesAsync() > 0;
         }
 
