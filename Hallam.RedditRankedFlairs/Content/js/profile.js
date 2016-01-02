@@ -83,7 +83,7 @@
         };
     });
 
-    app.controller('RegisterController', function ($scope, ajax, modal) {
+    app.controller('RegisterController', function ($scope, $timeout, ajax, modal) {
         var dialog = modal('#modal-register');
 
         dialog.shown(function () {
@@ -92,17 +92,32 @@
             window.setTimeout(function () { $('#summonerName').focus(); }, 100);
         });
 
+        var validationAttempts;
+
         function executeValidation() {
             var data = {
                 region: $scope.region,
                 summonerName: $scope.summonerName
             };
-            ajax.post('/profile/api/validate', data, function (success, data) {
-                $scope.busy = false;
-                if (!success) {
-                    $scope.alert = { text: data.error };
+            ajax.post('/profile/api/validate', data, function (success, data, status) {
+                if (status == 417) {
+                    if (--validationAttempts) {
+                        $timeout(executeValidation, 5000);
+                        return;
+                    }
+                    $scope.alert = { text: 'Validation was unsuccessful. Please double check the rune page.' };
+                    $scope.busy = false;
                     return;
                 }
+                else {
+                    $scope.busy = false;
+                    if (!success) {
+                        $scope.alert = { text: data.error };
+                    }
+                    return;
+                }
+                
+
                 dialog.hide();
                 $scope.summoners.update();
             });
@@ -129,6 +144,7 @@
             $scope.alert = null;
             
             if ($scope.code) {
+                validationAttempts = 3;
                 executeValidation();
             }
             else {
