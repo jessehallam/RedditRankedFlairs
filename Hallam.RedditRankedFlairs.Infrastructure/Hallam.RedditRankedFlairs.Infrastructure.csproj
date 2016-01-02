@@ -79,6 +79,7 @@
     <Compile Include="Services\SummonerService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Services\SubRedditService.cs" />
+    <Compile Include="Services\ValidationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hallam.RedditRankedFlairs.Data\Hallam.RedditRankedFlairs.Data.csproj">

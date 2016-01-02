@@ -26,13 +26,15 @@ namespace Hallam.RedditRankedFlairs.Controllers
         protected IRiotService Riot { get; set; }
         protected ISummonerService Summoners { get; set; }
         protected IUserService Users { get; set; }
+        protected ValidationService Validation { get; set; }
 
         public RegistrationController(IRiotService riotService, ISummonerService summonerService,
-            IUserService userService)
+            IUserService userService, ValidationService validationService)
         {
             Riot = riotService;
             Summoners = summonerService;
             Users = userService;
+            Validation = validationService;
         }
 
         [HttpPost, Route("profile/api/register")]
@@ -55,7 +57,7 @@ namespace Hallam.RedditRankedFlairs.Controllers
                 
                 return Ok(new
                 {
-                    code = RegistrationCode.Generate((await Users.GetUserAsync()).Name, summoner.Id, model.Region)
+                    code = await Validation.GenerateAsync(User.Identity.Name, summoner.Id, model.Region)
                 });
             }
             catch (RiotHttpException e)
@@ -94,8 +96,8 @@ namespace Hallam.RedditRankedFlairs.Controllers
                 }
 
                 var runePages = await Riot.GetRunePagesAsync(model.Region, riotSummoner.Id);
-                var code = RegistrationCode.Generate(user.Name, riotSummoner.Id, model.Region);
-
+                var code = await Validation.GenerateAsync(User.Identity.Name, riotSummoner.Id, model.Region);
+                
                 if (!runePages.Any(page => string.Equals(page.Name, code, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     return StatusCode(HttpStatusCode.ExpectationFailed);
@@ -136,27 +138,6 @@ namespace Hallam.RedditRankedFlairs.Controllers
         {
             return CacheUtil.GetItemAsync($"{region}:{summonerName}".ToLowerInvariant(),
                 () => Riot.FindSummonerAsync(region, summonerName));
-        }
-
-        private static class RegistrationCode
-        {
-            public static string Generate(string user, int summonerId, string region)
-            {
-                var nonce = string.Concat(user, ":", summonerId, ":", region).ToLowerInvariant();
-                var hash = Hash(nonce);
-                return ToHexString(hash);
-            }
-
-            private static uint Hash(string s)
-            {
-                return s.Aggregate<char, uint>(5381, (current, c) => ((current << 5) + current) + c);
-            }
-
-            private static string ToHexString(uint value)
-            {
-                var bytes = BitConverter.GetBytes(value);
-                return string.Join("", bytes.Select(x => x.ToString("X2")));
-            }
         }
     }
 }
