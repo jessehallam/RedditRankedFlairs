@@ -100,6 +100,8 @@
                 summonerName: $scope.summonerName
             };
             ajax.post('/profile/api/validate', data, function (success, data, status) {
+                console.log(arguments);
+
                 if (status == 417) {
                     if (--validationAttempts) {
                         $timeout(executeValidation, 5000);
@@ -109,14 +111,13 @@
                     $scope.busy = false;
                     return;
                 }
-                else {
-                    $scope.busy = false;
-                    if (!success) {
-                        $scope.alert = { text: data.error };
-                    }
+
+                $scope.busy = false;
+
+                if (!success) {
+                    $scope.alert = { text: data.error || 'Error validating summoner.' };
                     return;
                 }
-                
 
                 dialog.hide();
                 $scope.summoners.update();
