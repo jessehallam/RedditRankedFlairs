@@ -38,6 +38,13 @@ namespace Hallam.RedditRankedFlairs
             // Property injection in action filters
             builder.RegisterFilterProvider();
 
+            // Config
+
+            builder.Register(context => new ApplicationConfiguration
+            {
+                LeagueDataStaleTime = TimeSpan.Parse(ConfigurationManager.AppSettings["website.leagueUpdateStaleTime"])
+            }).SingleInstance();
+
             // Services
             builder.RegisterType(typeof (RoleService)).As(typeof (IRoleService)).SingleInstance();
             builder.RegisterType(typeof (UserService)).As(typeof (IUserService)).InstancePerLifetimeScope();

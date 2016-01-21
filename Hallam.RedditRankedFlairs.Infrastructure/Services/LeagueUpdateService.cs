@@ -9,18 +9,18 @@ namespace Hallam.RedditRankedFlairs.Services
 {
     public class LeagueUpdateService : ILeagueUpdateService
     {
-        private static readonly TimeSpan LeagueStaleTime = TimeSpan.FromHours(4);
-
         private readonly IUnitOfWork _context;
+        private readonly ApplicationConfiguration _config;
 
-        public LeagueUpdateService(IUnitOfWork context)
+        public LeagueUpdateService(IUnitOfWork context, ApplicationConfiguration config)
         {
             _context = context;
+            _config = config;
         }
 
         public async Task<ICollection<Summoner>> GetSummonersForUpdateAsync(int max)
         {
-            var cutoff = DateTimeOffset.Now - LeagueStaleTime;
+            var cutoff = DateTimeOffset.Now - _config.LeagueDataStaleTime;
             var query = from summoner in _context.Summoners
                         where summoner.LeagueInfo.UpdatedTime.HasValue
                               && summoner.LeagueInfo.UpdatedTime < cutoff

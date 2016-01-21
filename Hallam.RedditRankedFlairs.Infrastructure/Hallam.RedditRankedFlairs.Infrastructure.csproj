@@ -60,6 +60,7 @@
     <Compile Include="Jobs\LeagueUpdateJob.cs" />
     <Compile Include="LeagueUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ApplicationConfiguration.cs" />
     <Compile Include="Services\FlairUpdateService.cs" />
     <Compile Include="Services\IFlairService.cs" />
     <Compile Include="Services\ILeagueUpdateService.cs" />
