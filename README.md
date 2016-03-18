@@ -5,7 +5,35 @@ to add verified ranked flairs to contributors.
 
 **Configuration**
 
+All configuration is performed using the Web.Config. For security reasons, the actual Web.Config is not included. [Example web.config](http://pastebin.com/eJWSYTRY). *Don't forget to update your Machine Key.*
 
+App Settings Reference:
+
+* `Hangfire.disabled` (bool) - When true, the Hangfire.io server is not started.
+
+* `reddit.auth.clientId` (string) - The OAuth ClientId for the 'web app'. (see below)
+
+* `reddit.auth.clientSecret` (string) - The OAuth ClientSecret for the 'web app'.
+
+* `reddit.script.clientId` (string) - The OAuth ClientId for the 'personal use script'.
+
+* `reddit.script.clientSecret` (string) - The OAuth ClientSecret for the 'personal use script'.
+
+* `reddit.modUserName` (string) - The Reddit UserName for the Flair Mod account.
+
+* `reddit.modPassword` (string) - The Reddit Password for the Flair Mod account.
+
+* `riot.apiKey` (string) - The API key given by Riot for use with their public API.
+
+* `riot.maxAttempts` (int) - The maximum number of retries when a problem is encountered with Riot's API.
+
+* `riot.retryInterval` (System.TimeSpan) - The interval to wait after a problem before retrying.
+
+* `riot.maxRequestsPer10Seconds` (int) - The maximum number of requests per 10 second period before hitting the rate limiter.
+
+* `website.leagueUpdateStaleTime` (System.TimeSpan) - The duration after which a player's flair is considered stale and requires update.
+
+[Configuring OAuth](https://www.reddit.com/prefs/apps/): Add a 'web app' and a 'personal use script'.
 
 ## What's this all about?
 
