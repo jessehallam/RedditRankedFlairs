@@ -54,6 +54,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbUtil.cs" />
+    <Compile Include="Jobs\AsyncJobBase.cs" />
+    <Compile Include="Jobs\ConfirmFlairUpdatedMailJob.cs" />
+    <Compile Include="Jobs\ConfirmRegistrationMailJob.cs" />
+    <Compile Include="Services\IRedditMessengerService.cs" />
     <Compile Include="Jobs\BulkFlairUpdateJob.cs" />
     <Compile Include="Jobs\BulkLeagueUpdateJob.cs" />
     <Compile Include="Jobs\FlairUpdateJob.cs" />

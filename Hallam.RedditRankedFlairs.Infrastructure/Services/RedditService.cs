@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Hallam.RedditRankedFlairs.Reddit;
@@ -7,7 +8,7 @@ using Hallam.RedditRankedFlairs.Services.Reddit;
 
 namespace Hallam.RedditRankedFlairs.Services
 {
-    public class RedditService : IRedditService
+    public class RedditService : IRedditService, IRedditMessengerService
     {
         private const string BaseUri = "https://oauth.reddit.com";
         private readonly RedditWebRequester _requester;
@@ -41,7 +42,35 @@ namespace Hallam.RedditRankedFlairs.Services
                 if (after == null) break;
             }
             return results;
-        } 
+        }
+
+        public async Task<bool> SendMessageAsync(string toUserName, string subject, string body)
+        {
+            const int maxSubjectLength = 100;
+
+            if (string.IsNullOrEmpty(toUserName)) throw new ArgumentException("toUserName is required.");
+            if (string.IsNullOrEmpty(subject)) throw new ArgumentException("subject is required.");
+            if (string.IsNullOrEmpty(body)) throw new ArgumentException("body is required.");
+            if (subject.Length > maxSubjectLength) throw new ArgumentException("subject must not be longer than 100 characters.");
+
+            // for some reason, the /api/compose endpoint uses a POST request but wants its
+            // parameters in the query string.
+            var parameters = new[]
+            {
+                new { key = "to", value = toUserName },
+                new { key = "subject", value = subject },
+                new { key = "text", value = body }
+            };
+
+            var pairs = from p in parameters
+                        select $"{Uri.EscapeDataString(p.key)}={Uri.EscapeDataString(p.value)}";
+
+            var uri = $"{BaseUri}/api/compose?{string.Join("&", pairs)}";
+            Trace.WriteLine("POST " + uri);
+            var result = await _requester.PostAsync(uri);
+
+            return true;
+        }
 
         public async Task<bool> SetUserFlairAsync(string subreddit, string name, string text, string css = null)
         {
