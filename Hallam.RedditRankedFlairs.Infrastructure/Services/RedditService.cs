@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Hallam.RedditRankedFlairs.Reddit;
@@ -62,9 +63,10 @@ namespace Hallam.RedditRankedFlairs.Services
             };
 
             var pairs = from p in parameters
-                        select $"{Uri.EscapeUriString(p.key)}={Uri.EscapeUriString(p.value)}";
+                        select $"{Uri.EscapeDataString(p.key)}={Uri.EscapeDataString(p.value)}";
 
             var uri = $"{BaseUri}/api/compose?{string.Join("&", pairs)}";
+            Trace.WriteLine("POST " + uri);
             var result = await _requester.PostAsync(uri);
 
             return !result["json"]["errors"].Any();
