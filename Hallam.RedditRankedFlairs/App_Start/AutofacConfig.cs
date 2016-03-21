@@ -42,6 +42,7 @@ namespace Hallam.RedditRankedFlairs
 
             builder.Register(context => new ApplicationConfiguration
             {
+                FlairBotVersion = ConfigurationManager.AppSettings["bot.version"],
                 LeagueDataStaleTime = TimeSpan.Parse(ConfigurationManager.AppSettings["website.leagueUpdateStaleTime"])
             }).SingleInstance();
 
@@ -82,6 +83,8 @@ namespace Hallam.RedditRankedFlairs
             builder.RegisterType(typeof (BulkFlairUpdateJob)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (FlairUpdateJob)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (BulkLeagueUpdateJob)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof (ConfirmRegistrationMailJob)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof (ConfirmFlairUpdatedMailJob)).InstancePerLifetimeScope();
 
             // Data persistance
             builder.RegisterType(typeof (UnitOfWork)).As(typeof (IUnitOfWork)).InstancePerLifetimeScope();
