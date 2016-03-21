@@ -54,14 +54,13 @@ namespace Hallam.RedditRankedFlairs.Jobs
 
 ----
 
-[Report a problem](https://www.reddit.com/message/compose?to=kivinkujata&subject=Issue with FeralFlair) | 
-[Author](https://www.reddit.com/message/compose?to=kivinkujata&subject=Ranked Flairs) |
+[Report a problem](https://www.reddit.com/message/compose?to=kivinkujata&subject=Issue+with+FeralFlair) | 
+[Author](https://www.reddit.com/message/compose?to=kivinkujata&subject=Ranked+Flairs) |
 [GitHub](https://github.com/jessehallam/RedditRankedFlairs) | {version}";
 
-            var message = messagePattern.Replace("{summonerName}", summoner.Name);
-            message = messagePattern.Replace("{region}", summoner.Region);
-            message = messagePattern.Replace("{version}", _config.FlairBotVersion);
-            return message;
+            return messagePattern.Replace("{summonerName}", summoner.Name)
+                .Replace("{region}", summoner.Region)
+                .Replace("{version}", _config.FlairBotVersion);
         }
     }
 }
