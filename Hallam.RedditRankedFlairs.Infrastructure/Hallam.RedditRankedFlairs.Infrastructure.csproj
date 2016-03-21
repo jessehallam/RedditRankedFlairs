@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbUtil.cs" />
+    <Compile Include="Services\IRedditMessengerService.cs" />
     <Compile Include="Jobs\BulkFlairUpdateJob.cs" />
     <Compile Include="Jobs\BulkLeagueUpdateJob.cs" />
     <Compile Include="Jobs\FlairUpdateJob.cs" />

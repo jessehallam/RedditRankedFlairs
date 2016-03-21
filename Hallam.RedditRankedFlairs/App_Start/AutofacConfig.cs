@@ -50,7 +50,7 @@ namespace Hallam.RedditRankedFlairs
             builder.RegisterType(typeof (UserService)).As(typeof (IUserService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (SummonerService)).As(typeof (ISummonerService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (SubRedditService)).As(typeof (ISubRedditService)).InstancePerLifetimeScope();
-            builder.RegisterType(typeof (RedditService)).As(typeof (IRedditService)).InstancePerLifetimeScope();
+            builder.RegisterType(typeof (RedditService)).As(typeof (IRedditService), typeof (IRedditMessengerService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (FlairService)).As(typeof (IFlairService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (ValidationService)).InstancePerLifetimeScope();
             builder.RegisterType(typeof (LeagueUpdateService))
