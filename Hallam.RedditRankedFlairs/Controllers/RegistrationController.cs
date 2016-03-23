@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Configuration;
@@ -114,6 +115,7 @@ namespace Hallam.RedditRankedFlairs.Controllers
                     await Summoners.SetActiveSummonerAsync(currentSummoner);
 
                 // Send confirmation mail.
+                Trace.WriteLine($"user.id={user.Id}, user.name={user.Name}, summoner.Id={currentSummoner.Id}");
                 BackgroundJob.Enqueue<ConfirmRegistrationMailJob>(job => job.Execute(user.Id, currentSummoner.Id));
 
                 // Queue up the league update.
@@ -123,8 +125,8 @@ namespace Hallam.RedditRankedFlairs.Controllers
                 jobId = BackgroundJob.ContinueWith<FlairUpdateJob>(jobId, job => job.Execute(user.Id));
 
                 // Queue up confirmation mail.
-                jobId = BackgroundJob.ContinueWith<ConfirmFlairUpdatedMailJob>(jobId,
-                    job => job.Execute(user.Id, currentSummoner.Id));
+                //jobId = BackgroundJob.ContinueWith<ConfirmFlairUpdatedMailJob>(jobId,
+                //    job => job.Execute(user.Id, currentSummoner.Id));
 
                 return Ok();
             }

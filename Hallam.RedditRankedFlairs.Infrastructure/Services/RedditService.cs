@@ -69,7 +69,7 @@ namespace Hallam.RedditRankedFlairs.Services
             Trace.WriteLine("POST " + uri);
             var result = await _requester.PostAsync(uri);
 
-            return !result["json"]["errors"].Any();
+            return true;
         }
 
         public async Task<bool> SetUserFlairAsync(string subreddit, string name, string text, string css = null)
