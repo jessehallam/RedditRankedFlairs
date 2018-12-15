@@ -1,0 +1,50 @@
+@keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+blockquote {
+    font-size: 200%;
+    margin: 32px 0;
+    text-align: center;
+}
+
+.sign-in {
+    margin: 30px auto;
+    text-align: center;
+    width: 400px;
+}
+
+.content-main {
+    padding: 1rem;
+}
+
+.fade-in {
+    animation: fade-in;
+    animation-duration: .25s;
+    animation-timing-function: ease-in;
+}
+
+.summoner-list {
+    margin: 0;
+    padding: 0;
+
+    > li {
+        display: inline-block;
+        margin-right: 1rem;
+    }
+}
+
+.summoner-card {
+    opacity: 1;
+    width: 285px;
+
+    .btn + .btn {
+        margin-left: 4px;
+    }
+
+    &.deleted {
+        opacity: 0;
+        transition: opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+}

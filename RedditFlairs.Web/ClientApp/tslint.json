@@ -1,0 +1,47 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended",
+        "tslint-config-standard",
+        "tslint-react"
+    ],
+    "jsRules": {},
+    "rules": {
+        // Preference.
+        "indent": {
+            "options": ["spaces", 4]
+        },
+        "ter-indent": [true, 4],
+
+        // Has no impact on code quality.
+        "arrow-parens": [false],
+        "eofline": [false],
+        "member-ordering": {
+            "options": {
+                "alphabetize": true,
+                "order": "instance-sandwich"
+            }
+        },
+        "no-console": [false],
+        "no-empty": [false],
+        "no-debugger": [false],
+        "no-trailing-whitespace": [false],
+        "space-before-function-paren": [false],
+
+        // Slightly less strict.
+        "curly": {
+            "options": "ignore-same-line"
+        },
+        "jsx-no-lambda": [false],
+        "jsx-no-multiline-js": [false],
+        "jsx-self-close": [false],
+        "max-classes-per-file": [true, 10],
+        "member-access": {
+            "options": ["no-public"]
+        },
+        "no-empty-interface": [false],
+        "no-inner-declarations": [false],
+        "no-shadowed-variable": [false]
+    },
+    "rulesDirectory": []
+}

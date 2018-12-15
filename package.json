@@ -1,0 +1,7 @@
+{
+    "scripts": {
+        "dockerbuild": "docker build --rm -f Dockerfile -t jessehallam/redditrankedflairs:latest .",
+        "dockerpush": "docker push jessehallam/redditrankedflairs:latest",
+        "dockerpublish": "npm run dockerbuild && npm run dockerpush"
+    }
+}
