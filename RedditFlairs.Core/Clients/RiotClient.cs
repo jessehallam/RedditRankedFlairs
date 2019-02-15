@@ -54,6 +54,9 @@ namespace RedditFlairs.Core.Clients
                     return ajrClient.GetLeaguePositionsBySummonerIdAsync(encryptedSummonerId, GetPlatformId(region));
                 });
 
+            if (results == null)
+                return new LeaguePositionDto[0];
+
             return results.Select(pos => new LeaguePositionDto
             {
                 QueueType = pos.QueueType,
