@@ -69,6 +69,8 @@ namespace RedditFlairs.Web
             services.AddMvc(config => { config.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>(); });
 
             services.AddTasks();
+
+            services.AddRedditClient(Configuration);
             services.AddRiotClient(Configuration);
         }
 

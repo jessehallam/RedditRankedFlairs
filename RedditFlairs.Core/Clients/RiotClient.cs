@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using RiotNet;
 
 namespace RedditFlairs.Core.Clients
@@ -93,31 +91,5 @@ namespace RedditFlairs.Core.Clients
 
             return platformId;
         }
-    }
-
-    public static class RiotClientExtensions
-    {
-        public static void AddRiotClient(this IServiceCollection services, IConfiguration configuration)
-        {
-            var cache = services.BuildServiceProvider().GetRequiredService<IMemoryCache>();
-            var regionEndpionts = new Dictionary<string, string>();
-            configuration.GetSection("Riot:RegionEndpoints").Bind(regionEndpionts);
-            services.AddSingleton(new RiotClient(cache, regionEndpionts, configuration["Riot:ApiKey"]));
-        }
-    }
-
-    public class SummonerDto
-    {
-        public string AccountId { get; set; }
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string PuuId { get; set; }
-    }
-
-    public class LeaguePositionDto
-    {
-        public string QueueType { get; set; }
-        public string Rank { get; set; }
-        public string Tier { get; set; }
     }
 }
