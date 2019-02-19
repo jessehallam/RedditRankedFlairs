@@ -32,6 +32,7 @@ namespace RedditFlairs.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<TasksConfigSection>(Configuration.GetSection("Tasks"));
+            services.Configure<FlairPushConfig>(Configuration.GetSection("Tasks:FlairPush"));
             services.Configure<FlairUpdateConfig>(Configuration.GetSection("Tasks:FlairUpdate"));
             services.Configure<LeagueUpdateConfig>(Configuration.GetSection("Tasks:LeagueUpdate"));
             services.Configure<ValidationConfig>(Configuration.GetSection("Tasks:Validation"));
@@ -62,6 +63,7 @@ namespace RedditFlairs.Web
                     config.ClientId = Configuration["Reddit:SignIn:ClientId"];
                     config.ClientSecret = Configuration["Reddit:SignIn:ClientSecret"];
                 });
+
             services.AddAuthorization();
 
 

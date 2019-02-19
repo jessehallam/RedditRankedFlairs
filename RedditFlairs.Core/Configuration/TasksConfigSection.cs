@@ -8,9 +8,4 @@
         public LeagueUpdateConfig LeagueUpdate { get; set; }
         public ValidationConfig Validation { get; set; }
     }
-
-    public class FlairPushConfig
-    {
-        public bool Enable { get; set; }
-    }
 }
