@@ -13,7 +13,7 @@ namespace RedditFlairs.Core.Clients.Reddit
         private const string AccessTokenUrl = "https://www.reddit.com/api/v1/access_token";
 
         private readonly HttpClient httpClient;
-        private readonly object lockObject = new object();
+        private readonly SemaphoreSlim lockObject = new SemaphoreSlim(1, 1);
         private readonly RedditClientOptions options;
 
         private AccessToken accessToken = null;
@@ -30,18 +30,18 @@ namespace RedditFlairs.Core.Clients.Reddit
 
         public async Task<AccessToken> GetTokenAsync()
         {
-            Monitor.Enter(lockObject);
+            lockObject.Wait();
             try
             {
                 if (accessToken != null && accessToken.Expires > DateTimeOffset.Now.AddMinutes(1))
                     return accessToken;
 
                 var request = new HttpRequestMessage(HttpMethod.Post, AccessTokenUrl);
-                request.Content = new FormUrlEncodedContent(new []
+                request.Content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("grant_type","password"), 
-                    new KeyValuePair<string, string>("username",options.Username), 
-                    new KeyValuePair<string, string>("password",options.Password), 
+                    new KeyValuePair<string, string>("grant_type", "password"),
+                    new KeyValuePair<string, string>("username", options.Username),
+                    new KeyValuePair<string, string>("password", options.Password),
                 });
 
                 var response = await httpClient.SendAsync(request);
@@ -57,7 +57,7 @@ namespace RedditFlairs.Core.Clients.Reddit
             }
             finally
             {
-                Monitor.Exit(lockObject);
+                lockObject.Release();
             }
         }
     }
