@@ -33,6 +33,7 @@ namespace RedditFlairs.Core.Tasks.Implementations
             {
                 throw new TaskAbortedException();
             }
+
             var candidates = (await GetCandidatesAsync()).ToList();
 
             if (!candidates.Any())
@@ -41,11 +42,14 @@ namespace RedditFlairs.Core.Tasks.Implementations
                 return;
             }
 
-            var validationTasks = candidates.Select(ValidateSummonerAsync).ToList();
-            await Task.WhenAll(validationTasks);
+            foreach (var summoner in candidates)
+            {
+                await ValidateSummonerAsync(summoner);
+            }
+            
             await context.SaveChangesAsync();
         }
-        
+
         private async Task<IEnumerable<Summoner>> GetCandidatesAsync()
         {
             var cutoff = DateTimeOffset.Now.Subtract(config.AttemptInterval);
