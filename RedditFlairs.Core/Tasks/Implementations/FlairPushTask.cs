@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -26,7 +27,7 @@ namespace RedditFlairs.Core.Tasks.Implementations
             this.config = config.Value;
         }
 
-        public async Task ExecuteAsync()
+        public async Task ExecuteAsync(PerformContext perform)
         {
             if (!config.Enable)
             {
@@ -37,7 +38,7 @@ namespace RedditFlairs.Core.Tasks.Implementations
             {
                 var subReddits = context.SubReddits.ToList();
                 var processors = subReddits.Select(x => new SubRedditProcessor(scope.ServiceProvider.CreateScope(), x.Name)).ToList();
-                var processingTasks = processors.Select(x => x.ExecuteAsync()).ToList();
+                var processingTasks = processors.Select(x => x.ExecuteAsync(perform)).ToList();
 
                 await Task.WhenAll(processingTasks);
                 await Task.Delay(TimeSpan.FromMinutes(1));
@@ -58,7 +59,7 @@ namespace RedditFlairs.Core.Tasks.Implementations
                 redditClient = scope.ServiceProvider.GetRequiredService<IRedditClient>();
             }
 
-            public async Task ExecuteAsync()
+            public async Task ExecuteAsync(PerformContext perform)
             {
                 using (var context = scope.ServiceProvider.GetRequiredService<FlairDbContext>())
                 {

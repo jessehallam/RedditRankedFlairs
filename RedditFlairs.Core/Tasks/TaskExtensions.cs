@@ -30,7 +30,7 @@ namespace RedditFlairs.Core.Tasks
             {
                 RecurringJob.AddOrUpdate<SingleInstanceTask<PersistentTask<TTask>>>(
                     taskName,
-                    task => task.ExecuteAsync(),
+                    task => task.ExecuteAsync(null),
                     Cron.MinuteInterval(5));
             }
             else

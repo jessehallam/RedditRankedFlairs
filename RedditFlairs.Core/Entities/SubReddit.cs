@@ -12,6 +12,8 @@ namespace RedditFlairs.Core.Entities
         [Key]
         public string Name { get; set; }
 
+        public bool? RequiresUpdate { get; set; }
+
         public string QueueTypes { get; set; }
 
         public class EntityConfiguration : IEntityTypeConfiguration<SubReddit>

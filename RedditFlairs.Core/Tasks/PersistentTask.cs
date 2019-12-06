@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Hangfire.Server;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace RedditFlairs.Core.Tasks
@@ -15,7 +16,7 @@ namespace RedditFlairs.Core.Tasks
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task ExecuteAsync()
+        public async Task ExecuteAsync(PerformContext perform)
         {
             var startTime = DateTimeOffset.UtcNow;
 
@@ -35,7 +36,7 @@ namespace RedditFlairs.Core.Tasks
                     var asyncTask = scope.ServiceProvider.GetRequiredService<TTask>();
                     try
                     {
-                        await asyncTask.ExecuteAsync();
+                        await asyncTask.ExecuteAsync(perform);
                     }
                     catch (TaskAbortedException)
                     {

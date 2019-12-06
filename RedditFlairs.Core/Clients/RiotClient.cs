@@ -49,7 +49,7 @@ namespace RedditFlairs.Core.Clients
                 entry =>
                 {
                     entry.SetSlidingExpiration(TimeSpan.FromHours(1));
-                    return ajrClient.GetLeaguePositionsBySummonerIdAsync(encryptedSummonerId, GetPlatformId(region));
+                    return ajrClient.GetLeagueEntriesBySummonerIdAsync(encryptedSummonerId, GetPlatformId(region));
                 });
 
             if (results == null)

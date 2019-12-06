@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Hangfire.Console;
+using Hangfire.Server;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using RedditFlairs.Core.Clients;
 using RedditFlairs.Core.Configuration;
 using RedditFlairs.Core.Data;
 using RedditFlairs.Core.Entities;
+using RiotNet;
+using RiotClient = RedditFlairs.Core.Clients.RiotClient;
 
 namespace RedditFlairs.Core.Tasks.Implementations
 {
@@ -25,11 +31,11 @@ namespace RedditFlairs.Core.Tasks.Implementations
             this.config = config.Value;
         }
 
-        public async Task ExecuteAsync()
+        public async Task ExecuteAsync(PerformContext perform)
         {
             if (!config.Enable)
             {
-               throw new TaskAbortedException();
+                throw new TaskAbortedException();
             }
 
             var candidates = (await GetCandidatesAsync()).ToList();
@@ -42,9 +48,27 @@ namespace RedditFlairs.Core.Tasks.Implementations
 
             foreach (var summoner in candidates)
             {
-                await UpdateSummonerAsync(summoner);
+                try
+                {
+                    await UpdateSummonerAsync(summoner);
+                }
+                catch (RestException e)
+                {
+                    perform.WriteLine(
+                        $"Error updating summoner: Id={summoner.Id} Region={summoner.Region} SummonerId={summoner.SummonerId}");
+                    perform.LogHttpResponse(e.Response.Response);
+                    perform.ResetTextColor();
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    perform.WriteLine(
+                        $"Error updating summoner: Id={summoner.Id} Region={summoner.Region} SummonerId={summoner.SummonerId}");
+                    perform.ResetTextColor();
+                    throw;
+                }
             }
-            
+
             await context.SaveChangesAsync();
         }
 
@@ -78,6 +102,48 @@ namespace RedditFlairs.Core.Tasks.Implementations
             }
 
             summoner.RankUpdatedAt = DateTimeOffset.Now;
+        }
+    }
+
+    internal static class LoggingExtensions
+    {
+        public static void LogHttpResponse(this PerformContext perform, HttpResponseMessage response)
+        {
+            var request = response.RequestMessage;
+            var builder = new StringBuilder();
+
+            builder.AppendLine("Request:");
+            builder.AppendLine("  RequestUri = " + request.RequestUri);
+            builder.AppendLine("  Headers:");
+
+            foreach (var header in request.Headers)
+            {
+                foreach (var value in header.Value)
+                {
+                    builder.AppendLine($"    {header.Key}={value}");
+                }
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("Response:");
+            builder.AppendLine($"  StatusCode={response.StatusCode}");
+            builder.AppendLine($"  ReasonPhrase={response.ReasonPhrase}");
+            builder.AppendLine($"  Headers:");
+
+            foreach (var header in response.Headers)
+            {
+                foreach (var value in header.Value)
+                {
+                    builder.AppendLine($"    {header.Key}={value}");
+                }
+            }
+
+            builder.AppendLine("  Content:");
+            builder.AppendLine("----");
+            builder.AppendLine(response.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+            builder.AppendLine("----");
+
+            perform.WriteLine(builder.ToString());
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Hangfire.Server;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace RedditFlairs.Core.Tasks
@@ -13,7 +14,7 @@ namespace RedditFlairs.Core.Tasks
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task ExecuteAsync()
+        public async Task ExecuteAsync(PerformContext perform)
         {
             var locker = SingleInstanceRegistry.Instance.GetExclusiveLock(typeof(TTask));
 
@@ -25,7 +26,7 @@ namespace RedditFlairs.Core.Tasks
                 using (var scope = serviceProvider.CreateScope())
                 {
                     var asyncTask = scope.ServiceProvider.GetRequiredService<TTask>();
-                    await asyncTask.ExecuteAsync();
+                    await asyncTask.ExecuteAsync(perform);
                 }
             }
             finally

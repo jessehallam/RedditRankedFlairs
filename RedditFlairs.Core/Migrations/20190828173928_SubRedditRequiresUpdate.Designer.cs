@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RedditFlairs.Core.Data;
 
 namespace RedditFlairs.Core.Migrations
 {
     [DbContext(typeof(FlairDbContext))]
-    partial class FlairDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190828173928_SubRedditRequiresUpdate")]
+    partial class SubRedditRequiresUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

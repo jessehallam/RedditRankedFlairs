@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.Internal;
@@ -31,7 +32,7 @@ namespace RedditFlairs.Core.Tasks.Implementations
             this.config = config.Value;
         }
 
-        public async Task ExecuteAsync()
+        public async Task ExecuteAsync(PerformContext perform)
         {
             if (!config.Enable)
             {

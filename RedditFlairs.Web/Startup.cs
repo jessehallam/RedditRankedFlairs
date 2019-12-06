@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using AspNet.Security.OAuth.Reddit;
 using Hangfire;
+using Hangfire.Console;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -67,7 +68,11 @@ namespace RedditFlairs.Web
             services.AddAuthorization();
 
 
-            services.AddHangfire(config => { config.UseSqlServerStorage(Configuration.GetConnectionString("HangFire")); });
+            services.AddHangfire(config =>
+            {
+                config.UseSqlServerStorage(Configuration.GetConnectionString("HangFire"));
+                config.UseConsole();
+            });
             services.AddMvc(config => { config.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>(); });
 
             services.AddTasks();
